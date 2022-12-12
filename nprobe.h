@@ -184,22 +184,22 @@ typedef struct ether80211q {
 } Ether80211q;
 
 #ifndef TH_FIN
-#define	TH_FIN	0x01
+#define TH_FIN  0x01
 #endif
 #ifndef TH_SYN
-#define	TH_SYN	0x02
+#define TH_SYN  0x02
 #endif
 #ifndef TH_RST
-#define	TH_RST	0x04
+#define TH_RST  0x04
 #endif
 #ifndef TH_PUSH
-#define	TH_PUSH	0x08
+#define TH_PUSH 0x08
 #endif
 #ifndef TH_ACK
-#define	TH_ACK	0x10
+#define TH_ACK  0x10
 #endif
 #ifndef TH_URG
-#define	TH_URG	0x20
+#define TH_URG  0x20
 #endif
 
 #ifdef __TILECC__
@@ -243,13 +243,13 @@ struct ether_addr {
  * Structure of a 10Mb/s Ethernet header.
  */
 struct ether_header {
-  u_char	ether_dhost[6];
-  u_char	ether_shost[6];
-  u_short	ether_type;
+  u_char  ether_dhost[6];
+  u_char  ether_shost[6];
+  u_short ether_type;
 };
 
 #if !defined (__GNUC__)
-typedef	u_int	tcp_seq;
+typedef u_int tcp_seq;
 #endif
 
 /*
@@ -257,44 +257,44 @@ typedef	u_int	tcp_seq;
  * Per RFC 793, September, 1981.
  */
 struct tcphdr {
-	u_short	th_sport;		/* source port */
-	u_short	th_dport;		/* destination port */
-	tcp_seq	th_seq;			/* sequence number */
-	tcp_seq	th_ack;			/* acknowledgement number */
+  u_short th_sport;   /* source port */
+  u_short th_dport;   /* destination port */
+  tcp_seq th_seq;     /* sequence number */
+  tcp_seq th_ack;     /* acknowledgement number */
 #if BYTE_ORDER == LITTLE_ENDIAN
-	u_char	th_x2:4,		/* (unused) */
-		th_off:4;		/* data offset */
+  u_char  th_x2:4,    /* (unused) */
+    th_off:4;   /* data offset */
 #else
-	u_char	th_off:4,		/* data offset */
-		th_x2:4;		/* (unused) */
+  u_char  th_off:4,   /* data offset */
+    th_x2:4;    /* (unused) */
 #endif
-	u_char	th_flags;
-	u_short	th_win;			/* window */
-	u_short	th_sum;			/* checksum */
-	u_short	th_urp;			/* urgent pointer */
+  u_char  th_flags;
+  u_short th_win;     /* window */
+  u_short th_sum;     /* checksum */
+  u_short th_urp;     /* urgent pointer */
 };
 
 /* ********************************************* */
 
 struct ip {
 #if BYTE_ORDER == LITTLE_ENDIAN
-	u_char	ip_hl:4,		/* header length */
-		ip_v:4;			/* version */
+  u_char  ip_hl:4,    /* header length */
+    ip_v:4;     /* version */
 #else
-	u_char	ip_v:4,			/* version */
-		ip_hl:4;		/* header length */
+  u_char  ip_v:4,     /* version */
+    ip_hl:4;    /* header length */
 #endif
-	u_char	ip_tos;			/* type of service */
-	short	ip_len;			/* total length */
-	u_short	ip_id;			/* identification */
-	short	ip_off;			/* fragment offset field */
-#define	IP_DF 0x4000			/* dont fragment flag */
-#define	IP_MF 0x2000			/* more fragments flag */
-#define	IP_OFFMASK 0x1fff		/* mask for fragmenting bits */
-	u_char	ip_ttl;			/* time to live */
-	u_char	ip_p;			/* protocol */
-	u_short	ip_sum;			/* checksum */
-	struct	in_addr ip_src,ip_dst;	/* source and dest address */
+  u_char  ip_tos;     /* type of service */
+  short ip_len;     /* total length */
+  u_short ip_id;      /* identification */
+  short ip_off;     /* fragment offset field */
+#define IP_DF 0x4000      /* dont fragment flag */
+#define IP_MF 0x2000      /* more fragments flag */
+#define IP_OFFMASK 0x1fff   /* mask for fragmenting bits */
+  u_char  ip_ttl;     /* time to live */
+  u_char  ip_p;     /* protocol */
+  u_short ip_sum;     /* checksum */
+  struct  in_addr ip_src,ip_dst;  /* source and dest address */
 };
 
 /* ********************************************* */
@@ -304,10 +304,10 @@ struct ip {
  * Per RFC 768, September, 1981.
  */
 struct udphdr {
-	u_short	uh_sport;		/* source port */
-	u_short	uh_dport;		/* destination port */
-	short	uh_ulen;		/* udp length */
-	u_short	uh_sum;			/* udp checksum */
+  u_short uh_sport;   /* source port */
+  u_short uh_dport;   /* destination port */
+  short uh_ulen;    /* udp length */
+  u_short uh_sum;     /* udp checksum */
 };
 
 extern int gettimeofday(struct timeval *tv, struct timezone *tz);
@@ -322,9 +322,9 @@ extern int pthread_mutex_lock(pthread_mutex_t *mutex);
 extern int pthread_mutex_trylock(pthread_mutex_t *mutex);
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
-#define pthread_rwlock_init			pthread_mutex_init
-#define pthread_rwlock_wrlock			pthread_mutex_lock
-#define pthread_rwlock_unlock			pthread_mutex_unlock
+#define pthread_rwlock_init     pthread_mutex_init
+#define pthread_rwlock_wrlock     pthread_mutex_lock
+#define pthread_rwlock_unlock     pthread_mutex_unlock
 
 #endif /* WIN32 */
 
@@ -462,23 +462,23 @@ typedef char int8_t;
 /* ************************************ */
 
 #ifndef ETHERTYPE_IP
-#define	ETHERTYPE_IP		0x0800	/* IP protocol */
+#define ETHERTYPE_IP    0x0800  /* IP protocol */
 #endif
 
 #ifndef ETHERTYPE_IPV6
-#define	ETHERTYPE_IPV6		0x86DD	/* IPv6 protocol */
+#define ETHERTYPE_IPV6    0x86DD  /* IPv6 protocol */
 #endif
 
 #ifndef ETHERTYPE_MPLS
-#define	ETHERTYPE_MPLS		0x8847	/* MPLS protocol */
+#define ETHERTYPE_MPLS    0x8847  /* MPLS protocol */
 #endif
 
 #ifndef ETHERTYPE_MPLS_MULTI
-#define ETHERTYPE_MPLS_MULTI	0x8848	/* MPLS multicast packet */
+#define ETHERTYPE_MPLS_MULTI  0x8848  /* MPLS multicast packet */
 #endif
 
 #ifndef ETHERTYPE_PPPoE
-#define	ETHERTYPE_PPPoE		0x8864	/* PPP over Ethernet */
+#define ETHERTYPE_PPPoE   0x8864  /* PPP over Ethernet */
 #endif
 
 struct ether_mpls_header {
@@ -496,10 +496,10 @@ struct ppp_header {
 #ifndef SOLARIS
 /* VLAN support - Courtesy of  Mikael Cam <mca@mgn.net> - 2002/08/28 */
 #ifndef ETHER_ADDR_LEN
-#define	ETHER_ADDR_LEN	6
+#define ETHER_ADDR_LEN  6
 #endif
 
-struct	ether_vlan_header {
+struct  ether_vlan_header {
   u_char    evl_dhost[ETHER_ADDR_LEN];
   u_char    evl_shost[ETHER_ADDR_LEN];
   u_int16_t evl_encap_proto;
@@ -519,7 +519,7 @@ struct  ip6_ext {
 #define MAX_VLAN      4096
 
 #ifndef ETHERTYPE_VLAN
-#define	ETHERTYPE_VLAN		0x08100
+#define ETHERTYPE_VLAN    0x08100
 #endif
 
 typedef struct ipV4Fragment {
@@ -539,7 +539,7 @@ typedef struct ipV4Fragment {
 #endif
 
 typedef struct collectorAddress {
-  u_char isIPv6; /* 0=IPv4, 1=IPv6 or anything else (generic addrinfo) */		  
+  u_char isIPv6; /* 0=IPv4, 1=IPv6 or anything else (generic addrinfo) */     
   u_char transport; /* TRANSPORT_XXXX */
   u_int  flowSequence;
 
@@ -606,9 +606,9 @@ struct icmp_ra_addr
 
 struct icmp_hdr
 {
-  u_int8_t  icmp_type;	 /* type of message, see below */
-  u_int8_t  icmp_code;	 /* type sub code */
-  u_int16_t icmp_cksum;	 /* ones complement checksum of struct */
+  u_int8_t  icmp_type;   /* type of message, see below */
+  u_int8_t  icmp_code;   /* type sub code */
+  u_int16_t icmp_cksum;  /* ones complement checksum of struct */
   u_int16_t icmp_identifier, icmp_seqnum;
 
 };
@@ -616,48 +616,48 @@ struct icmp_hdr
 /*
  * Definition of ICMP types and code field values.
  */
-#define	NPROBE_ICMP_ECHOREPLY		0		/* echo reply */
-#define	NPROBE_ICMP_UNREACH		3		/* dest unreachable, codes: */
-#define	NPROBE_ICMP_UNREACH_NET	        0		/* bad net */
-#define	NPROBE_ICMP_UNREACH_HOST	1		/* bad host */
-#define	NPROBE_ICMP_UNREACH_PROTOCOL	2		/* bad protocol */
-#define	NPROBE_ICMP_UNREACH_PORT	3		/* bad port */
-#define	NPROBE_ICMP_UNREACH_NEEDFRAG	4		/* IP_DF caused drop */
-#define	NPROBE_ICMP_UNREACH_SRCFAIL	5		/* src route failed */
-#define	NPROBE_ICMP_UNREACH_NET_UNKNOWN 6		/* unknown net */
-#define	NPROBE_ICMP_UNREACH_HOST_UNKNOWN 7		/* unknown host */
-#define	NPROBE_ICMP_UNREACH_ISOLATED	8		/* src host isolated */
-#define	NPROBE_ICMP_UNREACH_NET_PROHIB	9		/* prohibited access */
-#define	NPROBE_ICMP_UNREACH_HOST_PROHIB 10		/* ditto */
-#define	NPROBE_ICMP_UNREACH_TOSNET	11		/* bad tos for net */
-#define	NPROBE_ICMP_UNREACH_TOSHOST	12		/* bad tos for host */
-#define	NPROBE_ICMP_UNREACH_FILTER_PROHIB 13		/* admin prohib */
-#define	NPROBE_ICMP_UNREACH_HOST_PRECEDENCE 14		/* host prec vio. */
-#define	NPROBE_ICMP_UNREACH_PRECEDENCE_CUTOFF 15	/* prec cutoff */
-#define	NPROBE_ICMP_SOURCEQUENCH	 4		/* packet lost, slow down */
-#define	NPROBE_ICMP_REDIRECT		 5		/* shorter route, codes: */
-#define	NPROBE_ICMP_REDIRECT_NET	 0		/* for network */
-#define	NPROBE_ICMP_REDIRECT_HOST	 1		/* for host */
-#define	NPROBE_ICMP_REDIRECT_TOSNET	 2		/* for tos and net */
-#define	NPROBE_ICMP_REDIRECT_TOSHOST	 3		/* for tos and host */
-#define	NPROBE_ICMP_ECHO		 8		/* echo service */
-#define	NPROBE_ICMP_ROUTERADVERT	 9		/* router advertisement */
-#define	NPROBE_ICMP_ROUTERSOLICIT	10		/* router solicitation */
-#define	NPROBE_ICMP_TIMXCEED		11		/* time exceeded, code: */
-#define	NPROBE_ICMP_TIMXCEED_INTRANS	 0		/* ttl==0 in transit */
-#define	NPROBE_ICMP_TIMXCEED_REASS	 1		/* ttl==0 in reass */
-#define	NPROBE_ICMP_PARAMPROB		12		/* ip header bad */
-#define	NPROBE_ICMP_PARAMPROB_ERRATPTR   0		/* error at param ptr */
-#define	NPROBE_ICMP_PARAMPROB_OPTABSENT  1		/* req. opt. absent */
-#define	NPROBE_ICMP_PARAMPROB_LENGTH     2			/* bad length */
-#define	NPROBE_ICMP_TSTAMP		13		/* timestamp request */
-#define	NPROBE_ICMP_TSTAMPREPLY	        14		/* timestamp reply */
-#define	NPROBE_ICMP_IREQ		15		/* information request */
-#define	NPROBE_ICMP_IREQREPLY		16		/* information reply */
-#define	NPROBE_ICMP_MASKREQ		17		/* address mask request */
-#define	NPROBE_ICMP_MASKREPLY		18		/* address mask reply */
+#define NPROBE_ICMP_ECHOREPLY   0   /* echo reply */
+#define NPROBE_ICMP_UNREACH   3   /* dest unreachable, codes: */
+#define NPROBE_ICMP_UNREACH_NET         0   /* bad net */
+#define NPROBE_ICMP_UNREACH_HOST  1   /* bad host */
+#define NPROBE_ICMP_UNREACH_PROTOCOL  2   /* bad protocol */
+#define NPROBE_ICMP_UNREACH_PORT  3   /* bad port */
+#define NPROBE_ICMP_UNREACH_NEEDFRAG  4   /* IP_DF caused drop */
+#define NPROBE_ICMP_UNREACH_SRCFAIL 5   /* src route failed */
+#define NPROBE_ICMP_UNREACH_NET_UNKNOWN 6   /* unknown net */
+#define NPROBE_ICMP_UNREACH_HOST_UNKNOWN 7    /* unknown host */
+#define NPROBE_ICMP_UNREACH_ISOLATED  8   /* src host isolated */
+#define NPROBE_ICMP_UNREACH_NET_PROHIB  9   /* prohibited access */
+#define NPROBE_ICMP_UNREACH_HOST_PROHIB 10    /* ditto */
+#define NPROBE_ICMP_UNREACH_TOSNET  11    /* bad tos for net */
+#define NPROBE_ICMP_UNREACH_TOSHOST 12    /* bad tos for host */
+#define NPROBE_ICMP_UNREACH_FILTER_PROHIB 13    /* admin prohib */
+#define NPROBE_ICMP_UNREACH_HOST_PRECEDENCE 14    /* host prec vio. */
+#define NPROBE_ICMP_UNREACH_PRECEDENCE_CUTOFF 15  /* prec cutoff */
+#define NPROBE_ICMP_SOURCEQUENCH   4    /* packet lost, slow down */
+#define NPROBE_ICMP_REDIRECT     5    /* shorter route, codes: */
+#define NPROBE_ICMP_REDIRECT_NET   0    /* for network */
+#define NPROBE_ICMP_REDIRECT_HOST  1    /* for host */
+#define NPROBE_ICMP_REDIRECT_TOSNET  2    /* for tos and net */
+#define NPROBE_ICMP_REDIRECT_TOSHOST   3    /* for tos and host */
+#define NPROBE_ICMP_ECHO     8    /* echo service */
+#define NPROBE_ICMP_ROUTERADVERT   9    /* router advertisement */
+#define NPROBE_ICMP_ROUTERSOLICIT 10    /* router solicitation */
+#define NPROBE_ICMP_TIMXCEED    11    /* time exceeded, code: */
+#define NPROBE_ICMP_TIMXCEED_INTRANS   0    /* ttl==0 in transit */
+#define NPROBE_ICMP_TIMXCEED_REASS   1    /* ttl==0 in reass */
+#define NPROBE_ICMP_PARAMPROB   12    /* ip header bad */
+#define NPROBE_ICMP_PARAMPROB_ERRATPTR   0    /* error at param ptr */
+#define NPROBE_ICMP_PARAMPROB_OPTABSENT  1    /* req. opt. absent */
+#define NPROBE_ICMP_PARAMPROB_LENGTH     2      /* bad length */
+#define NPROBE_ICMP_TSTAMP    13    /* timestamp request */
+#define NPROBE_ICMP_TSTAMPREPLY         14    /* timestamp reply */
+#define NPROBE_ICMP_IREQ    15    /* information request */
+#define NPROBE_ICMP_IREQREPLY   16    /* information reply */
+#define NPROBE_ICMP_MASKREQ   17    /* address mask request */
+#define NPROBE_ICMP_MASKREPLY   18    /* address mask reply */
 
-#define	NPROBE_ICMP_MAXTYPE		18
+#define NPROBE_ICMP_MAXTYPE   18
 
 /* ********* NETFLOW ****************** */
 
@@ -677,8 +677,8 @@ typedef unsigned int u_int32_t;
 
 /* ********************************* */
 
-#define FLOW_VERSION_1		     1
-#define V1FLOWS_PER_PAK		    30
+#define FLOW_VERSION_1         1
+#define V1FLOWS_PER_PAK       30
 
 struct flow_ver1_hdr {
   u_int16_t version;         /* Current version = 1*/
@@ -713,8 +713,8 @@ typedef struct single_flow_ver1_rec {
 
 /* ***************************************** */
 
-#define FLOW_VERSION_5		 5
-#define V5FLOWS_PER_PAK		30
+#define FLOW_VERSION_5     5
+#define V5FLOWS_PER_PAK   30
 
 struct flow_ver5_hdr {
   u_int16_t version;         /* Current version=5*/
@@ -735,9 +735,9 @@ struct flow_ver5_rec {
   u_int16_t input;      /* Input interface index */
   u_int16_t output;     /* Output interface index */
   u_int32_t dPkts;      /* Packets sent in Duration (milliseconds between 1st
-			   & last packet in this flow)*/
+         & last packet in this flow)*/
   u_int32_t dOctets;    /* Octets sent in Duration (milliseconds between 1st
-			   & last packet in  this flow)*/
+         & last packet in  this flow)*/
   u_int32_t first;      /* SysUptime at start of flow */
   u_int32_t last;       /* and of last packet of the flow */
   u_int16_t srcport;    /* TCP/UDP source port number (.e.g, FTP, Telnet, etc.,or equivalent) */
@@ -760,8 +760,8 @@ typedef struct single_flow_ver5_rec {
 
 /* ************************************ */
 
-#define FLOW_VERSION_7		    7
-#define V7FLOWS_PER_PAK		    28
+#define FLOW_VERSION_7        7
+#define V7FLOWS_PER_PAK       28
 
 /* ********************************* */
 
@@ -898,7 +898,7 @@ typedef struct flow_ver9_ipfix_template_elementids {
   u_int16_t templateElementLen;
   ElementFormat elementFormat; /* Only for elements longer than 4 bytes */
   ElementDumpFormat fileDumpFormat; /* Hint when data has to be printed on
-				       a human readable form */
+               a human readable form */
   char      *templateElementName, *templateElementDescr;
 } V9V10TemplateElementId;
 
@@ -1038,7 +1038,8 @@ typedef struct anyHeader {
 
 /* ************************************ */
 
-#define DUMP_TIMEOUT    30 /* seconds */
+#define DUMP_TIMEOUT      30   /* seconds */
+#define PCAP_FILE_TIMEOUT 300
 
 /* #define DEBUG  */
 
@@ -1062,20 +1063,20 @@ extern char *version, *osName, *buildDate;
 
 struct ip_header {
 #if BYTE_ORDER == LITTLE_ENDIAN
-	u_int	ihl:4,		/* header length */
-		version:4;			/* version */
+  u_int ihl:4,    /* header length */
+    version:4;      /* version */
 #else
-	u_int	version:4,			/* version */
-		ihl:4;		/* header length */
+  u_int version:4,      /* version */
+    ihl:4;    /* header length */
 #endif
-	u_char	tos;			/* type of service */
-	u_short	tot_len;			/* total length */
-	u_short	id;			/* identification */
-	u_short	frag_off;			/* fragment offset field */
-	u_char	ttl;			/* time to live */
-	u_char	protocol;			/* protocol */
-	u_short	check;			/* checksum */
-        u_int32_t saddr, daddr;	/* source and dest address */
+  u_char  tos;      /* type of service */
+  u_short tot_len;      /* total length */
+  u_short id;     /* identification */
+  u_short frag_off;     /* fragment offset field */
+  u_char  ttl;      /* time to live */
+  u_char  protocol;     /* protocol */
+  u_short check;      /* checksum */
+        u_int32_t saddr, daddr; /* source and dest address */
 };
 
 /*
@@ -1083,10 +1084,10 @@ struct ip_header {
  * Per RFC 768, September, 1981.
  */
 struct udp_header {
-	u_short	source;		/* source port */
-	u_short	dest;		/* destination port */
-	u_short	len;		/* udp length */
-	u_short	check;		/* udp checksum */
+  u_short source;   /* source port */
+  u_short dest;   /* destination port */
+  u_short len;    /* udp length */
+  u_short check;    /* udp checksum */
 };
 
 /* ************************************* */
@@ -1304,7 +1305,7 @@ typedef struct {
        fb_element[fb_element_len][max_num_entries]
        
        where each element fb_element[x][y] has length as
-       readOnlyGlobals.v9TemplateElementList[x]->templateElementLen					    
+       readOnlyGlobals.v9TemplateElementList[x]->templateElementLen             
     */
     pthread_mutex_t fb_mutex;
   } fastbit;
@@ -1345,12 +1346,14 @@ typedef struct {
 
 extern void exportBucket(FlowHashBucket *myBucket, u_char free_memory);
 extern void close_dump_file(void);
-extern void close_pcap_file(void);
+
+extern void SavePktToPcap(const struct pcap_pkthdr *h, const u_char *p);
+extern void ClosePcapFile(void);
 
 /* nprobe.c */
 extern void decodePacket(struct pcap_pkthdr *h, u_char *p,
-			 int input_index, int output_index,
-			 u_int32_t flow_sender_ip);
+       int input_index, int output_index,
+       u_int32_t flow_sender_ip);
 extern void recycleBucket(FlowHashBucket *myBucket);
 
 /* database.c */
@@ -1358,7 +1361,7 @@ extern u_char db_initialized;
 extern int exec_sql_query(char *sql, u_char dump_error_if_any);
 extern char* get_last_db_error(void);
 extern int init_database(char *db_host, char* user, char *pw, 
-			 char *db_name, char *tp);
+       char *db_name, char *tp);
 extern int init_db_table(void);
 extern void dump_flow2db(char *buffer, u_int32_t buffer_len);
 extern char * get_db_table_prefix(void);
@@ -1368,31 +1371,31 @@ extern void revertSlash(char *str, int mode);
 
 /* engine.c */
 extern void addPktToHash(u_int8_t proto, u_char isFragment,
-			 u_short numPkts, u_char tos,
-			 u_short vlanId, u_int32_t tunnel_id,
-			 struct ether_header *ehdr,
-			 IpAddress src, u_short sport,
-			 IpAddress dst, u_short dport,
-			 u_int len, u_int8_t flags,
-			 u_int8_t icmpType, u_int8_t icmpCode, struct icmp_hdr *icmpPkt,
-			 u_short numMplsLabels,
-			 u_char mplsLabels[MAX_NUM_MPLS_LABELS][MPLS_LABEL_LEN],
-			 u_int16_t if_input, u_int16_t if_output,
-			 char *fingerprint,
-			 struct pcap_pkthdr *h, u_char *p,
-			 u_int16_t payload_shift, int payloadLen,
-			 time_t firstSeen,
-			 u_int16_t src_as, u_int16_t dst_as,
-			 u_int16_t src_mask, u_int16_t dst_mask,
-			 u_int32_t flow_sender_ip);
+       u_short numPkts, u_char tos,
+       u_short vlanId, u_int32_t tunnel_id,
+       struct ether_header *ehdr,
+       IpAddress src, u_short sport,
+       IpAddress dst, u_short dport,
+       u_int len, u_int8_t flags,
+       u_int8_t icmpType, u_int8_t icmpCode, struct icmp_hdr *icmpPkt,
+       u_short numMplsLabels,
+       u_char mplsLabels[MAX_NUM_MPLS_LABELS][MPLS_LABEL_LEN],
+       u_int16_t if_input, u_int16_t if_output,
+       char *fingerprint,
+       struct pcap_pkthdr *h, u_char *p,
+       u_int16_t payload_shift, int payloadLen,
+       time_t firstSeen,
+       u_int16_t src_as, u_int16_t dst_as,
+       u_int16_t src_mask, u_int16_t dst_mask,
+       u_int32_t flow_sender_ip);
 extern u_int8_t db_initialized, skip_db_creation;
 extern HostHashBucket* findHost(IpAddress *host, u_int8_t allocHostIfNecessary,
-				u_int32_t ifHost, u_int16_t ifIdx);
+        u_int32_t ifHost, u_int16_t ifIdx);
 #ifdef HAVE_GEOIP
 extern GeoIPRecord* geoLocate(IpAddress *host);
 #endif
 extern void timeval_diff(struct timeval *begin, struct timeval *end, 
-			 struct timeval *result, u_short divide_by_two);
+       struct timeval *result, u_short divide_by_two);
 
 /* collect.c */
 extern int createNetFlowListener(u_short collectorInPort);

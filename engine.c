@@ -46,7 +46,7 @@ char* _intoaV4(unsigned int addr, char* buf, u_short bufLen) {
       *--cp = byte % 10 + '0';
       byte /= 10;
       if (byte > 0)
-	*--cp = byte + '0';
+  *--cp = byte + '0';
     }
     *--cp = '.';
     addr >>= 8;
@@ -108,9 +108,9 @@ char* formatTraffic(float numBits, int bits, char *buf) {
       tmpMBits /= 1024;
 
       if(tmpMBits < 1024) {
-	snprintf(buf, 32, "%.0f G%c", tmpMBits, unit);
+  snprintf(buf, 32, "%.0f G%c", tmpMBits, unit);
       } else {
-	snprintf(buf, 32, "%.0f T%c", (float)(tmpMBits)/1024, unit);
+  snprintf(buf, 32, "%.0f T%c", (float)(tmpMBits)/1024, unit);
       }
     }
   }
@@ -158,7 +158,7 @@ u_char ttlPredictor(u_char x) {
 /* ****************************************************** */
 
 void setPayload(FlowHashBucket *bkt, const struct pcap_pkthdr *h,
-		u_char *payload, int payloadLen, int direction) {
+    u_char *payload, int payloadLen, int direction) {
 
   if((readOnlyGlobals.maxPayloadLen > 0) && (payloadLen > 0)) {
     int diff;
@@ -167,32 +167,32 @@ void setPayload(FlowHashBucket *bkt, const struct pcap_pkthdr *h,
 
     if(direction == 0) {
       if(bkt->src2dstPayload == NULL)
-	bkt->src2dstPayload = (u_char*)malloc(sizeof(char)*(readOnlyGlobals.maxPayloadLen+1));
+  bkt->src2dstPayload = (u_char*)malloc(sizeof(char)*(readOnlyGlobals.maxPayloadLen+1));
 
       if(bkt->src2dstPayload != NULL) {
-	diff = readOnlyGlobals.maxPayloadLen-bkt->src2dstPayloadLen;
+  diff = readOnlyGlobals.maxPayloadLen-bkt->src2dstPayloadLen;
 
-	if(diff > 0) {
-	  if(diff > payloadLen) diff = payloadLen;
-	  memcpy(&bkt->src2dstPayload[bkt->src2dstPayloadLen], payload, diff);
-	  bkt->src2dstPayloadLen += diff;
-	}
+  if(diff > 0) {
+    if(diff > payloadLen) diff = payloadLen;
+    memcpy(&bkt->src2dstPayload[bkt->src2dstPayloadLen], payload, diff);
+    bkt->src2dstPayloadLen += diff;
+  }
       } else
-	traceEvent(TRACE_ERROR, "Not enough memory?");
+  traceEvent(TRACE_ERROR, "Not enough memory?");
     } else {
       if(bkt->dst2srcPayload == NULL)
-	bkt->dst2srcPayload = (u_char*)malloc(sizeof(char)*(readOnlyGlobals.maxPayloadLen+1));
+  bkt->dst2srcPayload = (u_char*)malloc(sizeof(char)*(readOnlyGlobals.maxPayloadLen+1));
 
       if(bkt->dst2srcPayload != NULL) {
-	diff = readOnlyGlobals.maxPayloadLen-bkt->dst2srcPayloadLen;
+  diff = readOnlyGlobals.maxPayloadLen-bkt->dst2srcPayloadLen;
 
-	if(diff > 0) {
-	  if(diff > payloadLen) diff = payloadLen;
-	  memcpy(&bkt->dst2srcPayload[bkt->dst2srcPayloadLen], payload, diff);
-	  bkt->dst2srcPayloadLen += diff;
-	}
+  if(diff > 0) {
+    if(diff > payloadLen) diff = payloadLen;
+    memcpy(&bkt->dst2srcPayload[bkt->dst2srcPayloadLen], payload, diff);
+    bkt->dst2srcPayloadLen += diff;
+  }
       } else
-	traceEvent(TRACE_ERROR, "Not enough memory?");
+  traceEvent(TRACE_ERROR, "Not enough memory?");
     }
 
     /* Jitter Calculation */
@@ -202,8 +202,8 @@ void setPayload(FlowHashBucket *bkt, const struct pcap_pkthdr *h,
 /* ************************************************* */
 
 void updateApplLatency(u_short proto, FlowHashBucket *bkt,
-		       int direction, struct timeval *stamp,
-		       u_int8_t icmpType, u_int8_t icmpCode) {
+           int direction, struct timeval *stamp,
+           u_int8_t icmpType, u_int8_t icmpCode) {
 
   if(!applLatencyComputed(bkt)) {
     /*
@@ -222,38 +222,38 @@ void updateApplLatency(u_short proto, FlowHashBucket *bkt,
     if(direction  == 0) {
       /* src->dst */
       if(bkt->src2dstApplLatency.tv_sec == 0)
-	bkt->src2dstApplLatency.tv_sec = stamp->tv_sec, bkt->src2dstApplLatency.tv_usec = stamp->tv_usec;
+  bkt->src2dstApplLatency.tv_sec = stamp->tv_sec, bkt->src2dstApplLatency.tv_usec = stamp->tv_usec;
 
       if(bkt->dst2srcApplLatency.tv_sec != 0) {
-	bkt->dst2srcApplLatency.tv_sec  = bkt->src2dstApplLatency.tv_sec-bkt->dst2srcApplLatency.tv_sec;
+  bkt->dst2srcApplLatency.tv_sec  = bkt->src2dstApplLatency.tv_sec-bkt->dst2srcApplLatency.tv_sec;
 
-	if((bkt->src2dstApplLatency.tv_usec-bkt->dst2srcApplLatency.tv_usec) < 0) {
-	  bkt->dst2srcApplLatency.tv_usec = 1000000 + bkt->src2dstApplLatency.tv_usec - bkt->dst2srcApplLatency.tv_usec;
-	  if(bkt->dst2srcApplLatency.tv_usec > 1000000) bkt->dst2srcApplLatency.tv_usec = 1000000;
-	  bkt->dst2srcApplLatency.tv_sec--;
-	} else
-	  bkt->dst2srcApplLatency.tv_usec = bkt->src2dstApplLatency.tv_usec-bkt->dst2srcApplLatency.tv_usec;
+  if((bkt->src2dstApplLatency.tv_usec-bkt->dst2srcApplLatency.tv_usec) < 0) {
+    bkt->dst2srcApplLatency.tv_usec = 1000000 + bkt->src2dstApplLatency.tv_usec - bkt->dst2srcApplLatency.tv_usec;
+    if(bkt->dst2srcApplLatency.tv_usec > 1000000) bkt->dst2srcApplLatency.tv_usec = 1000000;
+    bkt->dst2srcApplLatency.tv_sec--;
+  } else
+    bkt->dst2srcApplLatency.tv_usec = bkt->src2dstApplLatency.tv_usec-bkt->dst2srcApplLatency.tv_usec;
 
-	bkt->src2dstApplLatency.tv_sec = 0, bkt->src2dstApplLatency.tv_usec = 0;
-	NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags));
+  bkt->src2dstApplLatency.tv_sec = 0, bkt->src2dstApplLatency.tv_usec = 0;
+  NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags));
       }
     } else {
       /* dst -> src */
       if(bkt->dst2srcApplLatency.tv_sec == 0)
-	bkt->dst2srcApplLatency.tv_sec = stamp->tv_sec, bkt->dst2srcApplLatency.tv_usec = stamp->tv_usec;
+  bkt->dst2srcApplLatency.tv_sec = stamp->tv_sec, bkt->dst2srcApplLatency.tv_usec = stamp->tv_usec;
 
       if(bkt->src2dstApplLatency.tv_sec != 0) {
-	bkt->src2dstApplLatency.tv_sec  = bkt->dst2srcApplLatency.tv_sec-bkt->src2dstApplLatency.tv_sec;
+  bkt->src2dstApplLatency.tv_sec  = bkt->dst2srcApplLatency.tv_sec-bkt->src2dstApplLatency.tv_sec;
 
-	if((bkt->dst2srcApplLatency.tv_usec-bkt->src2dstApplLatency.tv_usec) < 0) {
-	  bkt->src2dstApplLatency.tv_usec = 1000000 + bkt->dst2srcApplLatency.tv_usec - bkt->src2dstApplLatency.tv_usec;
-	  if(bkt->src2dstApplLatency.tv_usec > 1000000) bkt->src2dstApplLatency.tv_usec = 1000000;
-	  bkt->src2dstApplLatency.tv_sec--;
-	} else
-	  bkt->src2dstApplLatency.tv_usec = bkt->dst2srcApplLatency.tv_usec-bkt->src2dstApplLatency.tv_usec;
+  if((bkt->dst2srcApplLatency.tv_usec-bkt->src2dstApplLatency.tv_usec) < 0) {
+    bkt->src2dstApplLatency.tv_usec = 1000000 + bkt->dst2srcApplLatency.tv_usec - bkt->src2dstApplLatency.tv_usec;
+    if(bkt->src2dstApplLatency.tv_usec > 1000000) bkt->src2dstApplLatency.tv_usec = 1000000;
+    bkt->src2dstApplLatency.tv_sec--;
+  } else
+    bkt->src2dstApplLatency.tv_usec = bkt->dst2srcApplLatency.tv_usec-bkt->src2dstApplLatency.tv_usec;
 
-	bkt->dst2srcApplLatency.tv_sec = 0, bkt->dst2srcApplLatency.tv_usec = 0;
-	NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags));
+  bkt->dst2srcApplLatency.tv_sec = 0, bkt->dst2srcApplLatency.tv_usec = 0;
+  NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags));
       }
     }
 
@@ -262,14 +262,14 @@ void updateApplLatency(u_short proto, FlowHashBucket *bkt,
       char buf[64], buf1[64];
 
       if(bkt->src2dstApplLatency.tv_sec || bkt->src2dstApplLatency.tv_usec)
-	printf("[Appl: %.2f ms (%s->%s)]", (float)(bkt->src2dstApplLatency.tv_sec*1000
-						   +(float)bkt->src2dstApplLatency.tv_usec/1000),
-	       _intoa(bkt->src, buf, sizeof(buf)), _intoa(bkt->dst, buf1, sizeof(buf1)));
+  printf("[Appl: %.2f ms (%s->%s)]", (float)(bkt->src2dstApplLatency.tv_sec*1000
+               +(float)bkt->src2dstApplLatency.tv_usec/1000),
+         _intoa(bkt->src, buf, sizeof(buf)), _intoa(bkt->dst, buf1, sizeof(buf1)));
       else
-	printf("[Appl: %.2f ms (%s->%s)]", (float)(bkt->dst2srcApplLatency.tv_sec*1000
-						   +(float)bkt->dst2srcApplLatency.tv_usec/1000),
-	       _intoa(bkt->dst, buf, sizeof(buf)), _intoa(bkt->src, buf1, sizeof(buf1))
-	       );
+  printf("[Appl: %.2f ms (%s->%s)]", (float)(bkt->dst2srcApplLatency.tv_sec*1000
+               +(float)bkt->dst2srcApplLatency.tv_usec/1000),
+         _intoa(bkt->dst, buf, sizeof(buf)), _intoa(bkt->src, buf1, sizeof(buf1))
+         );
     }
 #endif
   }
@@ -299,7 +299,7 @@ void updateTos(FlowHashBucket *bkt, int direction, u_char tos) {
 /* ****************************************************** */
 
 void timeval_diff(struct timeval *begin, struct timeval *end, 
-		  struct timeval *result, u_short divide_by_two) {
+      struct timeval *result, u_short divide_by_two) {
   if(end->tv_sec >= begin->tv_sec) {
     result->tv_sec = end->tv_sec-begin->tv_sec;
 
@@ -321,11 +321,11 @@ void timeval_diff(struct timeval *begin, struct timeval *end,
 #if 0
 static void print_flags(u_int8_t flags) {
   printf("%s%s%s%s%s\n",
-	 (flags & TH_SYN) ? " SYN" : "",
-	 (flags & TH_ACK) ? " ACK" : "",
-	 (flags & TH_FIN) ? " FIN" : "",
-	 (flags & TH_RST) ? " RST" : "",
-	 (flags & TH_PUSH) ? " PUSH" : "");
+   (flags & TH_SYN) ? " SYN" : "",
+   (flags & TH_ACK) ? " ACK" : "",
+   (flags & TH_FIN) ? " FIN" : "",
+   (flags & TH_RST) ? " RST" : "",
+   (flags & TH_PUSH) ? " PUSH" : "");
 }
 #endif
 
@@ -342,58 +342,58 @@ static void print_flags(u_int8_t flags) {
 */
 
 void updateTcpFlags(FlowHashBucket *bkt, int direction,
-		    struct timeval *stamp, u_int8_t flags,
-		    char *fingerprint) {
+        struct timeval *stamp, u_int8_t flags,
+        char *fingerprint) {
   if(!nwLatencyComputed(bkt)) {
     if(flags == TH_SYN) {
       bkt->synTime.tv_sec = stamp->tv_sec;
       bkt->synTime.tv_usec = stamp->tv_usec;
     } else if(flags == (TH_SYN | TH_ACK)) {
       if((bkt->synTime.tv_sec != 0) && (bkt->synAckTime.tv_sec == 0)) {
-	bkt->synAckTime.tv_sec  = stamp->tv_sec;
-	bkt->synAckTime.tv_usec = stamp->tv_usec;
-	timeval_diff(&bkt->synTime, stamp, &bkt->serverNwDelay, 1);
+  bkt->synAckTime.tv_sec  = stamp->tv_sec;
+  bkt->synAckTime.tv_usec = stamp->tv_usec;
+  timeval_diff(&bkt->synTime, stamp, &bkt->serverNwDelay, 1);
       }
     } else if(flags == TH_ACK) {
       if(bkt->synTime.tv_sec == 0) {
-	/* We missed the SYN flag */
-	NPROBE_FD_SET(FLAG_NW_LATENCY_COMPUTED,   &(bkt->flags));
-	NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags)); /* We cannot calculate it as we have
-								     missed the 3-way handshake */
-	return;
+  /* We missed the SYN flag */
+  NPROBE_FD_SET(FLAG_NW_LATENCY_COMPUTED,   &(bkt->flags));
+  NPROBE_FD_SET(FLAG_APPL_LATENCY_COMPUTED, &(bkt->flags)); /* We cannot calculate it as we have
+                     missed the 3-way handshake */
+  return;
       }
 
       if(((direction  == 0)    && (bkt->src2dstTcpFlags != TH_SYN))
-	 || ((direction  == 1) && (bkt->dst2srcTcpFlags != TH_SYN)))
-	return; /* Wrong flags */
+   || ((direction  == 1) && (bkt->dst2srcTcpFlags != TH_SYN)))
+  return; /* Wrong flags */
 
       if(bkt->synAckTime.tv_sec > 0) {
-	timeval_diff(&bkt->synAckTime, stamp, &bkt->clientNwDelay, 1);
+  timeval_diff(&bkt->synAckTime, stamp, &bkt->clientNwDelay, 1);
 
 #if 0
-	printf("[Client: %.1f ms][Server: %.1f ms]\n",
-	       (float)(bkt->clientNwDelay.tv_sec*1000+(float)bkt->clientNwDelay.tv_usec/1000),
-	       (float)(bkt->serverNwDelay.tv_sec*1000+(float)bkt->serverNwDelay.tv_usec/1000));
+  printf("[Client: %.1f ms][Server: %.1f ms]\n",
+         (float)(bkt->clientNwDelay.tv_sec*1000+(float)bkt->clientNwDelay.tv_usec/1000),
+         (float)(bkt->serverNwDelay.tv_sec*1000+(float)bkt->serverNwDelay.tv_usec/1000));
 #endif
 
-	NPROBE_FD_SET(FLAG_NW_LATENCY_COMPUTED, &(bkt->flags));
-	updateApplLatency(IPPROTO_TCP, bkt, direction, stamp, 0, 0);
+  NPROBE_FD_SET(FLAG_NW_LATENCY_COMPUTED, &(bkt->flags));
+  updateApplLatency(IPPROTO_TCP, bkt, direction, stamp, 0, 0);
       }
     }
   } else {
     /* Nw latency computed */
     if(!applLatencyComputed(bkt)) {
       /*
-	src ---------> dst -+
-	| Application
-	| Latency
-	<--------      -+
+  src ---------> dst -+
+  | Application
+  | Latency
+  <--------      -+
 
-	NOTE:
-	1. Application latency is calculated as the time passed since the first
-	packet sent after the 3-way handshake until the first packet on
-	the opposite direction is received.
-	2. Application latency is calculated only on the first packet
+  NOTE:
+  1. Application latency is calculated as the time passed since the first
+  packet sent after the 3-way handshake until the first packet on
+  the opposite direction is received.
+  2. Application latency is calculated only on the first packet
       */
 
       updateApplLatency(IPPROTO_TCP, bkt, direction, stamp, 0, 0);
@@ -438,7 +438,7 @@ static FlowHashBucket* allocFlowBucket(u_int8_t proto) {
     pthread_rwlock_unlock(&readWriteGlobals->rwGlobalsRwLock);
 #if 0
     traceEvent(TRACE_NORMAL, "[+] bucketsAllocated=%u",
-	       readWriteGlobals->bucketsAllocated);
+         readWriteGlobals->bucketsAllocated);
 #endif
   }
   
@@ -463,7 +463,7 @@ inline void updateHostInterface(HostHashBucket *bkt, u_int32_t ifHost, u_int16_t
 /* ****************************************************** */
 
 static HostHashBucket* allocHostHashBucket(int alloc_stats, IpAddress *host, 
-					   u_int32_t ifHost, u_int16_t ifIdx) {
+             u_int32_t ifHost, u_int16_t ifIdx) {
   HostHashBucket* bkt = (HostHashBucket*)calloc(1, sizeof(HostHashBucket));
 
   if(bkt == NULL) {
@@ -476,7 +476,7 @@ static HostHashBucket* allocHostHashBucket(int alloc_stats, IpAddress *host,
       bkt->stats = (HostStats*)calloc(1, sizeof(HostStats));
 
       if(bkt->stats != NULL) {
-	pthread_rwlock_init(&bkt->stats->host_lock, NULL);
+  pthread_rwlock_init(&bkt->stats->host_lock, NULL);
       }
     }
   }
@@ -491,15 +491,15 @@ static inline u_int32_t hostHash(IpAddress *host) {
     return(host->ipType.ipv4);
   else
     return(host->ipType.ipv6.s6_addr32[0]
-	   + host->ipType.ipv6.s6_addr32[1]
-	   + host->ipType.ipv6.s6_addr32[2]
-	   + host->ipType.ipv6.s6_addr32[3]);
+     + host->ipType.ipv6.s6_addr32[1]
+     + host->ipType.ipv6.s6_addr32[2]
+     + host->ipType.ipv6.s6_addr32[3]);
 }
 
 /* ****************************************************** */
 
 HostHashBucket* findHost(IpAddress *host, u_int8_t allocHostIfNecessary,
-			 u_int32_t ifHost, u_int16_t ifIdx) {
+       u_int32_t ifHost, u_int16_t ifIdx) {
   unsigned short local_host;
 
   if((host == NULL) || (host->ipVersion == 6))
@@ -520,11 +520,11 @@ HostHashBucket* findHost(IpAddress *host, u_int8_t allocHostIfNecessary,
   while_host_search:
     while(bkt != NULL) {
       if(cmpIpAddress(&bkt->host, host)) {
-	updateHostInterface(bkt, ifHost, ifIdx);
-	return(bkt);
+  updateHostInterface(bkt, ifHost, ifIdx);
+  return(bkt);
     } else {
-	prev_bkt = bkt;
-	bkt = bkt->stats->next;
+  prev_bkt = bkt;
+  bkt = bkt->stats->next;
       }
     } /* while */
 
@@ -568,12 +568,12 @@ void printHostStats(HostHashBucket *host) {
   char buf[32];
 
   traceEvent(TRACE_NORMAL,
-	     "%s [sent=%u/%u,rcvd=%u/%u]\n",
-	     _intoa(host->host, buf, sizeof(buf)),
-	     host->stats ? host->stats->accumulateStats.num_pkts_sent : 0,
-	     host->stats ? host->stats->accumulateStats.num_bytes_sent : 0,
-	     host->stats ? host->stats->accumulateStats.num_pkts_rcvd : 0,
-	     host->stats ? host->stats->accumulateStats.num_bytes_rcvd : 0);
+       "%s [sent=%u/%u,rcvd=%u/%u]\n",
+       _intoa(host->host, buf, sizeof(buf)),
+       host->stats ? host->stats->accumulateStats.num_pkts_sent : 0,
+       host->stats ? host->stats->accumulateStats.num_bytes_sent : 0,
+       host->stats ? host->stats->accumulateStats.num_pkts_rcvd : 0,
+       host->stats ? host->stats->accumulateStats.num_bytes_rcvd : 0);
 }
 
 /* ****************************************************** */
@@ -588,9 +588,9 @@ void checkStatsUpdate(HostStats *stats) {
 /* ****************************************************** */
 
 void updateFlowHosts(FlowHashBucket *myBucket, 
-		     const struct pcap_pkthdr *h,
-		     u_int8_t new_flow,
-		     u_int8_t final_update) {
+         const struct pcap_pkthdr *h,
+         u_int8_t new_flow,
+         u_int8_t final_update) {
   HostStats *stats;
      
   if(myBucket->src->stats != NULL) {
@@ -601,9 +601,9 @@ void updateFlowHosts(FlowHashBucket *myBucket,
       stats->accumulateStats.num_pkts_sent++, stats->accumulateStats.num_bytes_sent += h->len;
     } else {
       stats->accumulateStats.num_pkts_sent += myBucket->flowCounters.pktSent,
-	stats->accumulateStats.num_pkts_rcvd += myBucket->flowCounters.pktRcvd,
-	stats->accumulateStats.num_bytes_sent += myBucket->flowCounters.bytesSent,
-	stats->accumulateStats.num_bytes_rcvd += myBucket->flowCounters.bytesRcvd;
+  stats->accumulateStats.num_pkts_rcvd += myBucket->flowCounters.pktRcvd,
+  stats->accumulateStats.num_bytes_sent += myBucket->flowCounters.bytesSent,
+  stats->accumulateStats.num_bytes_rcvd += myBucket->flowCounters.bytesRcvd;
     }
 
     if(new_flow) {
@@ -661,23 +661,23 @@ inline u_int32_t to_msec(struct timeval *tv) {
 /* ****************************************************** */
 
 void addPktToHash(u_int8_t proto, u_char isFragment,
-		  u_short numPkts, u_char tos,
-		  u_short vlanId, u_int32_t tunnel_id,
-		  struct ether_header *ehdr,
-		  IpAddress src, u_short sport,
-		  IpAddress dst, u_short dport,
-		  u_int len, u_int8_t flags,
-		  u_int8_t icmpType, u_int8_t icmpCode, struct icmp_hdr *icmpPkt,
-		  u_short numMplsLabels,
-		  u_char mplsLabels[MAX_NUM_MPLS_LABELS][MPLS_LABEL_LEN],
-		  u_int16_t if_input, u_int16_t if_output,
-		  char *fingerprint,
-		  struct pcap_pkthdr *h, u_char *p,
-		  u_int16_t payload_shift, int payloadLen,
-		  time_t _firstSeen, /* Always set to 0 unless numPkts > 0 */		  
-		  u_int16_t src_as, u_int16_t dst_as,
-		  u_int16_t src_mask, u_int16_t dst_mask,
-		  u_int32_t flow_sender_ip) {
+      u_short numPkts, u_char tos,
+      u_short vlanId, u_int32_t tunnel_id,
+      struct ether_header *ehdr,
+      IpAddress src, u_short sport,
+      IpAddress dst, u_short dport,
+      u_int len, u_int8_t flags,
+      u_int8_t icmpType, u_int8_t icmpCode, struct icmp_hdr *icmpPkt,
+      u_short numMplsLabels,
+      u_char mplsLabels[MAX_NUM_MPLS_LABELS][MPLS_LABEL_LEN],
+      u_int16_t if_input, u_int16_t if_output,
+      char *fingerprint,
+      struct pcap_pkthdr *h, u_char *p,
+      u_int16_t payload_shift, int payloadLen,
+      time_t _firstSeen, /* Always set to 0 unless numPkts > 0 */     
+      u_int16_t src_as, u_int16_t dst_as,
+      u_int16_t src_mask, u_int16_t dst_mask,
+      u_int32_t flow_sender_ip) {
   u_char *payload = NULL;
   u_int32_t n=0, mutex_idx;
   FlowHashBucket *bkt, *prev_bkt = NULL;
@@ -719,10 +719,10 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
     char buf[256], buf1[256];
 
     printf("[%4s] %s:%d -> %s:%d [len=%u][payloadLen=%d][idx=%d]\n",
-	   proto2name(proto),
-	   _intoa(src, buf, sizeof(buf)), (int)sport,
-	   _intoa(dst, buf1, sizeof(buf1)), (int)dport,
-	   len, payloadLen, idx);
+     proto2name(proto),
+     _intoa(src, buf, sizeof(buf)), (int)sport,
+     _intoa(dst, buf1, sizeof(buf1)), (int)dport,
+     len, payloadLen, idx);
   }
 #endif
 
@@ -752,65 +752,65 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
     if((bkt->proto == proto)
        && (bkt->vlanId == vlanId)
        && (((bkt->sport == sport)
-	    && (bkt->dport == dport)
-	    && ((bkt->src2dstTos & 0xfe) == (tos & 0xfe))
-	    && cmpIpAddress(&bkt->src->host, &src)
-	    && cmpIpAddress(&bkt->dst->host, &dst)
-	    )
-	   || ((bkt->sport == dport)
-	       && (bkt->dport == sport)
-	       && ((bkt->dst2srcTos & 0xfe) == (tos & 0xfe))
-	       && cmpIpAddress(&bkt->src->host, &dst)
-	       && cmpIpAddress(&bkt->dst->host, &src)
-	       )
-	   )
+      && (bkt->dport == dport)
+      && ((bkt->src2dstTos & 0xfe) == (tos & 0xfe))
+      && cmpIpAddress(&bkt->src->host, &src)
+      && cmpIpAddress(&bkt->dst->host, &dst)
+      )
+     || ((bkt->sport == dport)
+         && (bkt->dport == sport)
+         && ((bkt->dst2srcTos & 0xfe) == (tos & 0xfe))
+         && cmpIpAddress(&bkt->src->host, &dst)
+         && cmpIpAddress(&bkt->dst->host, &src)
+         )
+     )
        ) {
       if(!bkt->sampled_flow) {
-	/* This flow has not been sampled */
-	if(cmpIpAddress(&bkt->src->host, &src)) {
-	  bkt->flowCounters.bytesSent += len, bkt->flowCounters.pktSent += numPkts;
-	  bkt->flowTimers.lastSeenSent.tv_sec = h->ts.tv_sec, bkt->flowTimers.lastSeenSent.tv_usec = h->ts.tv_usec;
-	  if(isFragment) NPROBE_FD_SET(FLAG_FRAGMENTED_PACKET_SRC2DST, &(bkt->flags));
+  /* This flow has not been sampled */
+  if(cmpIpAddress(&bkt->src->host, &src)) {
+    bkt->flowCounters.bytesSent += len, bkt->flowCounters.pktSent += numPkts;
+    bkt->flowTimers.lastSeenSent.tv_sec = h->ts.tv_sec, bkt->flowTimers.lastSeenSent.tv_usec = h->ts.tv_usec;
+    if(isFragment) NPROBE_FD_SET(FLAG_FRAGMENTED_PACKET_SRC2DST, &(bkt->flags));
 
-	  updateTos(bkt, 0, tos);
-	  if(proto == IPPROTO_TCP)
-	    updateTcpFlags(bkt, 0, &h->ts, flags, fingerprint);
-	  else if((proto == IPPROTO_UDP) || (proto == IPPROTO_ICMP))
-	    updateApplLatency(proto, bkt, 0, &h->ts, icmpType, icmpCode);
+    updateTos(bkt, 0, tos);
+    if(proto == IPPROTO_TCP)
+      updateTcpFlags(bkt, 0, &h->ts, flags, fingerprint);
+    else if((proto == IPPROTO_UDP) || (proto == IPPROTO_ICMP))
+      updateApplLatency(proto, bkt, 0, &h->ts, icmpType, icmpCode);
 
-	  setPayload(bkt, h, payload, payloadLen, 0);
-	  bkt->src2dstTcpFlags |= flags; /* Do not move this line before updateTcpFlags(...) */
-	} else {
-	  bkt->flowCounters.bytesRcvd += len, bkt->flowCounters.pktRcvd += numPkts;
-	  if(((bkt->flowTimers.firstSeenRcvd.tv_sec == 0) && (bkt->flowTimers.firstSeenRcvd.tv_usec == 0)) 
-	     || (to_msec(&firstSeen) < to_msec(&bkt->flowTimers.firstSeenRcvd)))	
-	    bkt->flowTimers.firstSeenRcvd.tv_sec = firstSeen.tv_sec, bkt->flowTimers.firstSeenRcvd.tv_usec = firstSeen.tv_usec;
+    setPayload(bkt, h, payload, payloadLen, 0);
+    bkt->src2dstTcpFlags |= flags; /* Do not move this line before updateTcpFlags(...) */
+  } else {
+    bkt->flowCounters.bytesRcvd += len, bkt->flowCounters.pktRcvd += numPkts;
+    if(((bkt->flowTimers.firstSeenRcvd.tv_sec == 0) && (bkt->flowTimers.firstSeenRcvd.tv_usec == 0)) 
+       || (to_msec(&firstSeen) < to_msec(&bkt->flowTimers.firstSeenRcvd)))  
+      bkt->flowTimers.firstSeenRcvd.tv_sec = firstSeen.tv_sec, bkt->flowTimers.firstSeenRcvd.tv_usec = firstSeen.tv_usec;
 
-	  bkt->flowTimers.lastSeenRcvd.tv_sec = h->ts.tv_sec, bkt->flowTimers.lastSeenRcvd.tv_usec = h->ts.tv_usec;
-	  if(isFragment) NPROBE_FD_SET(FLAG_FRAGMENTED_PACKET_DST2SRC, &(bkt->flags));
+    bkt->flowTimers.lastSeenRcvd.tv_sec = h->ts.tv_sec, bkt->flowTimers.lastSeenRcvd.tv_usec = h->ts.tv_usec;
+    if(isFragment) NPROBE_FD_SET(FLAG_FRAGMENTED_PACKET_DST2SRC, &(bkt->flags));
 
-	  updateTos(bkt, 1, tos);
-	  if(proto == IPPROTO_TCP)
-	    updateTcpFlags(bkt, 1, &h->ts, flags, fingerprint);
-	  else if((proto == IPPROTO_UDP) || (proto == IPPROTO_ICMP))
-	    updateApplLatency(proto, bkt, 1, &h->ts, icmpType, icmpCode);
+    updateTos(bkt, 1, tos);
+    if(proto == IPPROTO_TCP)
+      updateTcpFlags(bkt, 1, &h->ts, flags, fingerprint);
+    else if((proto == IPPROTO_UDP) || (proto == IPPROTO_ICMP))
+      updateApplLatency(proto, bkt, 1, &h->ts, icmpType, icmpCode);
 
-	  setPayload(bkt, h, payload, payloadLen, 1);
-	  bkt->dst2srcTcpFlags |= flags; /* Do not move this line before updateTcpFlags(...) */
-	}
+    setPayload(bkt, h, payload, payloadLen, 1);
+    bkt->dst2srcTcpFlags |= flags; /* Do not move this line before updateTcpFlags(...) */
+  }
 
-	/* Sanity check */
-	if(payload == NULL) payloadLen = 0;
+  /* Sanity check */
+  if(payload == NULL) payloadLen = 0;
 
-	pluginCallback(PACKET_CALLBACK, bkt,
-		       proto, isFragment, numPkts, tos,
-		       vlanId, ehdr, &src, sport,
-		       &dst, dport, len,
-		       flags, icmpType, icmpPkt, numMplsLabels,
-		       mplsLabels, fingerprint,
-		       h, p, payload, payloadLen);
+  pluginCallback(PACKET_CALLBACK, bkt,
+           proto, isFragment, numPkts, tos,
+           vlanId, ehdr, &src, sport,
+           &dst, dport, len,
+           flags, icmpType, icmpPkt, numMplsLabels,
+           mplsLabels, fingerprint,
+           h, p, payload, payloadLen);
       } else {
-	/* traceEvent(TRACE_NORMAL, "--> Sampled flow"); */
+  /* traceEvent(TRACE_NORMAL, "--> Sampled flow"); */
       }
 
       if(!readOnlyGlobals.deferredHostUpdate) updateFlowHosts(bkt, h, 0, 0);
@@ -839,10 +839,10 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
       static u_char msgSent = 0;
 
       if(!msgSent) {
-	traceEvent(TRACE_WARNING, "WARNING: too many (%u) active flows [limit=%u] (see -M)",
-		   readWriteGlobals->bucketsAllocated,
-		   readOnlyGlobals.maxNumActiveFlows);
-	msgSent = 1;
+  traceEvent(TRACE_WARNING, "WARNING: too many (%u) active flows [limit=%u] (see -M)",
+       readWriteGlobals->bucketsAllocated,
+       readOnlyGlobals.maxNumActiveFlows);
+  msgSent = 1;
       }
       readWriteGlobals->droppedPktsTooManyFlows++;
 
@@ -927,16 +927,16 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
     bkt->mplsInfo = malloc(sizeof(struct mpls_labels));
     bkt->mplsInfo->numMplsLabels = numMplsLabels;
     memcpy(bkt->mplsInfo->mplsLabels, mplsLabels,
-	   MAX_NUM_MPLS_LABELS*MPLS_LABEL_LEN);
+     MAX_NUM_MPLS_LABELS*MPLS_LABEL_LEN);
   }
 
   pluginCallback(CREATE_FLOW_CALLBACK, bkt,
-		 proto,  isFragment, numPkts,  tos,
-		 vlanId, ehdr, &src,  sport,
-		 &dst,  dport, len,
-		 flags,  icmpType, icmpPkt, numMplsLabels,
-		 mplsLabels, fingerprint,
-		 h, p, payload, payloadLen);
+     proto,  isFragment, numPkts,  tos,
+     vlanId, ehdr, &src,  sport,
+     &dst,  dport, len,
+     flags,  icmpType, icmpPkt, numMplsLabels,
+     mplsLabels, fingerprint,
+     h, p, payload, payloadLen);
 
   /* Put the bucket on top of the list */
   addToList(bkt, &readWriteGlobals->theFlowHash[hash_idx][idx]);
@@ -953,9 +953,9 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
     char buf[256], buf1[256];
 
     traceEvent(TRACE_INFO, "New Flow: [%s] %s:%d -> %s:%d",
-	       proto2name(proto),
-	       _intoa(src, buf, sizeof(buf)), sport,
-	       _intoa(dst, buf1, sizeof(buf1)), dport);
+         proto2name(proto),
+         _intoa(src, buf, sizeof(buf)), sport,
+         _intoa(dst, buf1, sizeof(buf1)), dport);
   }
 }
 
@@ -963,21 +963,21 @@ void addPktToHash(u_int8_t proto, u_char isFragment,
 
 void printICMPflags(u_int32_t flags, char *icmpBuf, int icmpBufLen) {
   snprintf(icmpBuf, icmpBufLen, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_ECHOREPLY, &flags)     ? "[ECHO REPLY]" : "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_UNREACH, &flags)       ? "[UNREACH]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_SOURCEQUENCH, &flags)  ? "[SOURCE_QUENCH]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_REDIRECT, &flags)      ? "[REDIRECT]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_ECHO, &flags)          ? "[ECHO]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_ROUTERADVERT, &flags)  ? "[ROUTERADVERT]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_ROUTERSOLICIT, &flags) ? "[ROUTERSOLICIT]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_TIMXCEED, &flags)      ? "[TIMXCEED]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_PARAMPROB, &flags)     ? "[PARAMPROB]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_TSTAMP, &flags)        ? "[TIMESTAMP]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_TSTAMPREPLY, &flags)   ? "[TIMESTAMP REPLY]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_IREQ, &flags)          ? "[INFO REQ]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_IREQREPLY, &flags)     ? "[INFO REPLY]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_MASKREQ , &flags)      ? "[MASK REQ]": "",
-	   NPROBE_FD_ISSET(NPROBE_ICMP_MASKREPLY, &flags)     ? "[MASK REPLY]": "");
+     NPROBE_FD_ISSET(NPROBE_ICMP_ECHOREPLY, &flags)     ? "[ECHO REPLY]" : "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_UNREACH, &flags)       ? "[UNREACH]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_SOURCEQUENCH, &flags)  ? "[SOURCE_QUENCH]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_REDIRECT, &flags)      ? "[REDIRECT]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_ECHO, &flags)          ? "[ECHO]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_ROUTERADVERT, &flags)  ? "[ROUTERADVERT]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_ROUTERSOLICIT, &flags) ? "[ROUTERSOLICIT]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_TIMXCEED, &flags)      ? "[TIMXCEED]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_PARAMPROB, &flags)     ? "[PARAMPROB]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_TSTAMP, &flags)        ? "[TIMESTAMP]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_TSTAMPREPLY, &flags)   ? "[TIMESTAMP REPLY]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_IREQ, &flags)          ? "[INFO REQ]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_IREQREPLY, &flags)     ? "[INFO REPLY]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_MASKREQ , &flags)      ? "[MASK REQ]": "",
+     NPROBE_FD_ISSET(NPROBE_ICMP_MASKREPLY, &flags)     ? "[MASK REPLY]": "");
 }
 
 /* ****************************************************** */
@@ -994,7 +994,7 @@ void printFlow(FlowHashBucket *theFlow, int direction) {
   if(nwLatencyComputed(theFlow)
      && ((theFlow->clientNwDelay.tv_sec > 0) || (theFlow->clientNwDelay.tv_usec > 0))) {
     snprintf(latBuf, sizeof(latBuf), " [CND: %.2f ms]",
-	     (float)(theFlow->clientNwDelay.tv_sec*1000+(float)theFlow->clientNwDelay.tv_usec/1000));
+       (float)(theFlow->clientNwDelay.tv_sec*1000+(float)theFlow->clientNwDelay.tv_usec/1000));
   }
 
   if(nwLatencyComputed(theFlow)
@@ -1002,18 +1002,18 @@ void printFlow(FlowHashBucket *theFlow, int direction) {
     int len = strlen(latBuf);
 
     snprintf(&latBuf[len], sizeof(latBuf)-len, " [SND: %.2f ms]",
-	     (float)(theFlow->serverNwDelay.tv_sec*1000+(float)theFlow->serverNwDelay.tv_usec/1000));
+       (float)(theFlow->serverNwDelay.tv_sec*1000+(float)theFlow->serverNwDelay.tv_usec/1000));
   }
 
   if(applLatencyComputed(theFlow)) {
     if((direction == 0) && (theFlow->src2dstApplLatency.tv_sec || theFlow->src2dstApplLatency.tv_usec))
       snprintf(applLatBuf, sizeof(applLatBuf), " [A: %.2f ms]",
-	       (float)(theFlow->src2dstApplLatency.tv_sec*1000
-		       +(float)theFlow->src2dstApplLatency.tv_usec/1000));
+         (float)(theFlow->src2dstApplLatency.tv_sec*1000
+           +(float)theFlow->src2dstApplLatency.tv_usec/1000));
     else if((direction == 1) && (theFlow->dst2srcApplLatency.tv_sec || theFlow->dst2srcApplLatency.tv_usec))
       snprintf(applLatBuf, sizeof(applLatBuf), " [A: %.2f ms]",
-	       (float)(theFlow->dst2srcApplLatency.tv_sec*1000
-		       +(float)theFlow->dst2srcApplLatency.tv_usec/1000));
+         (float)(theFlow->dst2srcApplLatency.tv_sec*1000
+           +(float)theFlow->dst2srcApplLatency.tv_usec/1000));
   }
 
   if(theFlow->proto == IPPROTO_ICMP) {
@@ -1035,19 +1035,19 @@ void printFlow(FlowHashBucket *theFlow, int direction) {
 
   if(direction == 0) {
     traceEvent(TRACE_INFO, "Emitting Flow: [->][%s] %s:%d -> %s:%d [%d/%d pkt][%d/%d bytes]%s%s%s%s%s%s%s",
-	       proto2name(theFlow->proto), _intoa(theFlow->src->host, buf, sizeof(buf)), theFlow->sport,
-	       _intoa(theFlow->dst->host, buf1, sizeof(buf1)), theFlow->dport,
-	       (int)theFlow->flowCounters.pktSent, (int)theFlow->flowCounters.pktRcvd,
-	       (int)theFlow->flowCounters.bytesSent, (int)theFlow->flowCounters.bytesRcvd,
-	       latBuf, applLatBuf, jitterStr, icmpBuf, fragmented, vlanStr, tunnelStr);
+         proto2name(theFlow->proto), _intoa(theFlow->src->host, buf, sizeof(buf)), theFlow->sport,
+         _intoa(theFlow->dst->host, buf1, sizeof(buf1)), theFlow->dport,
+         (int)theFlow->flowCounters.pktSent, (int)theFlow->flowCounters.pktRcvd,
+         (int)theFlow->flowCounters.bytesSent, (int)theFlow->flowCounters.bytesRcvd,
+         latBuf, applLatBuf, jitterStr, icmpBuf, fragmented, vlanStr, tunnelStr);
     if(theFlow->src2dstFingerprint[0] != '\0')
       traceEvent(TRACE_INFO, "Fingeprint: '%s'", theFlow->src2dstFingerprint);
   } else {
     traceEvent(TRACE_INFO, "Emitting Flow: [<-][%s] %s:%d -> %s:%d [%d pkt/%d bytes]%s%s%s%s%s%s",
-	       proto2name(theFlow->proto), _intoa(theFlow->dst->host, buf, sizeof(buf)), theFlow->dport,
-	       _intoa(theFlow->src->host, buf1, sizeof(buf1)), theFlow->sport,
-	       (int)theFlow->flowCounters.pktRcvd, (int)theFlow->flowCounters.bytesRcvd, latBuf,
-	       applLatBuf, jitterStr, icmpBuf, fragmented, vlanStr, tunnelStr);
+         proto2name(theFlow->proto), _intoa(theFlow->dst->host, buf, sizeof(buf)), theFlow->dport,
+         _intoa(theFlow->src->host, buf1, sizeof(buf1)), theFlow->sport,
+         (int)theFlow->flowCounters.pktRcvd, (int)theFlow->flowCounters.bytesRcvd, latBuf,
+         applLatBuf, jitterStr, icmpBuf, fragmented, vlanStr, tunnelStr);
     if(theFlow->dst2srcFingerprint[0] != '\0')
       traceEvent(TRACE_INFO, "Fingeprint: '%s'", theFlow->dst2srcFingerprint);
   }
@@ -1072,11 +1072,11 @@ int isFlowExpired(FlowHashBucket *myBucket, time_t theTime) {
      || ((theTime-myBucket->flowTimers.lastSeenSent.tv_sec)  >= readOnlyGlobals.idleTimeout)      /* flow expired: data not sent for a while */
      || ((theTime-myBucket->flowTimers.firstSeenSent.tv_sec) >= readOnlyGlobals.lifetimeTimeout)  /* flow expired: flow active but too old   */
      || ((myBucket->flowCounters.pktRcvd > 0)
-	 && (((theTime-myBucket->flowTimers.lastSeenRcvd.tv_sec) >= readOnlyGlobals.idleTimeout)  /* flow expired: data not sent for a while */
-	     || ((theTime-myBucket->flowTimers.firstSeenRcvd.tv_sec) >= readOnlyGlobals.lifetimeTimeout)))  /* flow expired: flow active but too old   */
+   && (((theTime-myBucket->flowTimers.lastSeenRcvd.tv_sec) >= readOnlyGlobals.idleTimeout)  /* flow expired: data not sent for a while */
+       || ((theTime-myBucket->flowTimers.firstSeenRcvd.tv_sec) >= readOnlyGlobals.lifetimeTimeout)))  /* flow expired: flow active but too old   */
      || ((myBucket->proto == IPPROTO_TCP) && (theTime-myBucket->flowTimers.lastSeenSent.tv_sec > 10 /* sec */)
-	 && endTcpFlow(myBucket->src2dstTcpFlags)
-	 && endTcpFlow(myBucket->dst2srcTcpFlags))     
+   && endTcpFlow(myBucket->src2dstTcpFlags)
+   && endTcpFlow(myBucket->dst2srcTcpFlags))     
      ) {
     return(1);
   } else {
@@ -1092,8 +1092,8 @@ int isFlowExpiredSinceTooLong(FlowHashBucket *myBucket, time_t theTime) {
      || ((theTime-myBucket->flowTimers.lastSeenSent.tv_sec)  >= 2*readOnlyGlobals.idleTimeout)      /* flow expired: data not sent for a while */
      || ((theTime-myBucket->flowTimers.firstSeenSent.tv_sec) >= 2*readOnlyGlobals.lifetimeTimeout)  /* flow expired: flow active but too old   */
      || ((myBucket->flowCounters.pktRcvd > 0)
-	 && (((theTime-myBucket->flowTimers.lastSeenRcvd.tv_sec) >= 2*readOnlyGlobals.idleTimeout)  /* flow expired: data not sent for a while */
-	     || ((theTime-myBucket->flowTimers.firstSeenRcvd.tv_sec) >= 2*readOnlyGlobals.lifetimeTimeout)))  /* flow expired: flow active but too old   */
+   && (((theTime-myBucket->flowTimers.lastSeenRcvd.tv_sec) >= 2*readOnlyGlobals.idleTimeout)  /* flow expired: data not sent for a while */
+       || ((theTime-myBucket->flowTimers.firstSeenRcvd.tv_sec) >= 2*readOnlyGlobals.lifetimeTimeout)))  /* flow expired: flow active but too old   */
      ) {
     return(1);
   } else {
@@ -1116,10 +1116,10 @@ void printBucket(FlowHashBucket *myBucket) {
 #endif
     {
       printf("[%4s] %s:%d [%u pkts] <-> %s:%d [%u pkts] [FsSent=%d][LsSent=%d][FsRcvd=%d][LsRcvd=%d]\n",
-	     proto2name(myBucket->proto),
-	     _intoa(myBucket->src->host, str, sizeof(str)), myBucket->sport, myBucket->flowCounters.pktSent,
-	     _intoa(myBucket->dst->host, str1, sizeof(str1)), myBucket->dport, myBucket->flowCounters.pktRcvd,
-	     a, b, c, d);
+       proto2name(myBucket->proto),
+       _intoa(myBucket->src->host, str, sizeof(str)), myBucket->sport, myBucket->flowCounters.pktSent,
+       _intoa(myBucket->dst->host, str1, sizeof(str1)), myBucket->dport, myBucket->flowCounters.pktRcvd,
+       a, b, c, d);
     }
 }
 
@@ -1127,7 +1127,7 @@ void printBucket(FlowHashBucket *myBucket) {
 
 void walkHash(u_int32_t hash_idx, int flushHash) {
   u_int walkIndex, mutex_idx = 0, old_mutex_idx = mutex_idx+1; /* This to make sure that we lock 
-								  the mutex at the first run */
+                  the mutex at the first run */
   FlowHashBucket *myPrevBucket, *myBucket, *myNextBucket;
   time_t now = time(NULL);
   u_int num_lock = 0, num_unlock = 0;
@@ -1144,7 +1144,7 @@ void walkHash(u_int32_t hash_idx, int flushHash) {
 
     if(!readOnlyGlobals.rebuild_hash) {
       if(mutex_idx != old_mutex_idx)
-	pthread_rwlock_wrlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]), num_lock++;
+  pthread_rwlock_wrlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]), num_lock++;
     } else {
       if(readWriteGlobals->thePrevFlowHash == NULL) return; /* Too early */
     }
@@ -1160,77 +1160,77 @@ void walkHash(u_int32_t hash_idx, int flushHash) {
     while(myBucket != NULL) {
 #ifdef ENABLE_MAGIC
       if(myBucket->magic != 67) {
-	printf("Error (2): magic error detected (magic=%d)\n", myBucket->magic);
+  printf("Error (2): magic error detected (magic=%d)\n", myBucket->magic);
       }
 #endif
 
       if(readWriteGlobals->shutdownInProgress) {
-	if(!readOnlyGlobals.rebuild_hash) {
-	  pthread_rwlock_unlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]);
-	  return;
-	}
+  if(!readOnlyGlobals.rebuild_hash) {
+    pthread_rwlock_unlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]);
+    return;
+  }
       }
 
       if(flushHash
-	 || readOnlyGlobals.rebuild_hash
-	 || isFlowExpired(myBucket, now)) {
+   || readOnlyGlobals.rebuild_hash
+   || isFlowExpired(myBucket, now)) {
 #ifdef DEBUG_EXPORT
-	printf("Found flow to emit (expired)(idx=%d)\n",walkIndex);
+  printf("Found flow to emit (expired)(idx=%d)\n",walkIndex);
 #endif
 
-	myNextBucket = myBucket->next;
+  myNextBucket = myBucket->next;
 
-	if(myPrevBucket != NULL)
-	  myPrevBucket->next = myNextBucket;
-	else {
-	  if((!readOnlyGlobals.rebuild_hash) || flushHash || readOnlyGlobals.pcapFile /* We're reading from a dump file */)
-	    readWriteGlobals->theFlowHash[hash_idx][walkIndex] = myNextBucket;
-	  else
-	    readWriteGlobals->thePrevFlowHash[hash_idx][walkIndex] = myNextBucket;
-	}
+  if(myPrevBucket != NULL)
+    myPrevBucket->next = myNextBucket;
+  else {
+    if((!readOnlyGlobals.rebuild_hash) || flushHash || readOnlyGlobals.pcapFile /* We're reading from a dump file */)
+      readWriteGlobals->theFlowHash[hash_idx][walkIndex] = myNextBucket;
+    else
+      readWriteGlobals->thePrevFlowHash[hash_idx][walkIndex] = myNextBucket;
+  }
 
-	/*
-	  We've updated the pointers, hence removed this bucket from the active bucket list,
-	  therefore we now invalidate the next pointer 
-	*/
-	myBucket->next = NULL;
+  /*
+    We've updated the pointers, hence removed this bucket from the active bucket list,
+    therefore we now invalidate the next pointer 
+  */
+  myBucket->next = NULL;
 
-	if(!myBucket->sampled_flow) {
-	  if(readWriteGlobals->exportBucketsLen < MAX_EXPORT_QUEUE_LEN) {
-	    /*
-	      The flow is both expired and we have room in the export
-	      queue to send it out, hence we can export it
-	    */
-	    queueBucketToExport(myBucket);
-	  } else {
-	    /* The export queue is full:
-	       
-	       The flow is expired and in queue since too long. As there's
-	       no room left in queue, the only thing we can do is to 
-	       drop it
-	    */
-	    discardBucket(myBucket);
-	    readWriteGlobals->totFlowDropped++;
-	  }
-	} else {
-	  /* Free bucket */
-	  discardBucket(myBucket);
-	}
+  if(!myBucket->sampled_flow) {
+    if(readWriteGlobals->exportBucketsLen < MAX_EXPORT_QUEUE_LEN) {
+      /*
+        The flow is both expired and we have room in the export
+        queue to send it out, hence we can export it
+      */
+      queueBucketToExport(myBucket);
+    } else {
+      /* The export queue is full:
+         
+         The flow is expired and in queue since too long. As there's
+         no room left in queue, the only thing we can do is to 
+         drop it
+      */
+      discardBucket(myBucket);
+      readWriteGlobals->totFlowDropped++;
+    }
+  } else {
+    /* Free bucket */
+    discardBucket(myBucket);
+  }
 
-	myBucket = myNextBucket;
+  myBucket = myNextBucket;
       } else {
-	/* Move to the next bucket */
-	myPrevBucket = myBucket;
-	myBucket = myBucket->next;
+  /* Move to the next bucket */
+  myPrevBucket = myBucket;
+  myBucket = myBucket->next;
       }
 #ifndef WIN32
-	sched_yield();
+  sched_yield();
 #endif
     } /* while */
 
     if(!readOnlyGlobals.rebuild_hash) {
       if(mutex_idx != old_mutex_idx) {
-	pthread_rwlock_unlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]), num_unlock++;
+  pthread_rwlock_unlock(&readWriteGlobals->flowHashRwLock[hash_idx][mutex_idx]), num_unlock++;
       }
     }
   } /* for */
@@ -1241,7 +1241,7 @@ void walkHash(u_int32_t hash_idx, int flushHash) {
 
   if((num_lock != num_unlock) || (num_lock != (readOnlyGlobals.flowHashSize-1)))
     traceEvent(TRACE_WARNING, "Internal error [hash_idx=%d][locks=%d][unlocks=%d]\n", 
-	       hash_idx, num_lock, num_unlock);
+         hash_idx, num_lock, num_unlock);
 }
 
 /* ****************************************************** */
@@ -1266,20 +1266,83 @@ void sqlite_exec_sql(char* sql) {
 
 /* ****************************************************** */
 
-void close_pcap_file() {
+
+/* Save the specific packet into a pcap file */
+void SavePktToPcap(const struct pcap_pkthdr *h, const u_char *p){
+  int rc = 0;
+  if(readOnlyGlobals.pcapDirPath != NULL) {
+    time_t theTime = time(NULL);
+    static time_t lastTheTime = 0;
+    struct tm *tm;
+    char creation_time[256], dir_path[256];
+
+    // theTime -= (theTime % readOnlyGlobals.file_dump_timeout);
+    theTime -= (theTime % PCAP_FILE_TIMEOUT);
+
+    if(lastTheTime != theTime) {
+      pthread_rwlock_wrlock(&readWriteGlobals->pcapFileLock);
+      if(lastTheTime != theTime) {
+        ClosePcapFile();
+        lastTheTime = theTime;
+      }
+      pthread_rwlock_unlock(&readWriteGlobals->pcapFileLock);
+    }
+
+    if((readWriteGlobals->pcapDumper == NULL)) {
+      pthread_rwlock_wrlock(&readWriteGlobals->pcapFileLock);
+      if((readWriteGlobals->pcapDumper == NULL)) {
+
+        tm = localtime(&theTime);
+
+        strftime(creation_time, sizeof(creation_time), "%Y%m%d%H", tm);
+        snprintf(dir_path, sizeof(dir_path), "mkdir %s %s", 
+            "-p", readOnlyGlobals.pcapDirPath);
+
+        rc = system(dir_path);
+
+        snprintf(readWriteGlobals->pcapFilePath,
+                 sizeof(readWriteGlobals->pcapFilePath),
+                 "%s%c%s%02d.%s%s",
+                 readOnlyGlobals.pcapDirPath, '/', creation_time, 
+                 tm->tm_min - (tm->tm_min % ((PCAP_FILE_TIMEOUT+59)/60)),
+                 // tm->tm_min - (tm->tm_min % ((readOnlyGlobals.file_dump_timeout+59)/60)),
+                 "pcap",
+                 TEMP_PREFIX);
+        if((readWriteGlobals->pcapDumperFile = fopen(readWriteGlobals->pcapFilePath,"w")) != NULL){
+          if((readWriteGlobals->pcapDumper = pcap_dump_fopen(readOnlyGlobals.pcapPtr, readWriteGlobals->pcapDumperFile)) != NULL){
+            if(readOnlyGlobals.traceMode) traceEvent(TRACE_NORMAL, "Saving pcap into temporary file '%s'", readWriteGlobals->pcapFilePath);
+          } else {
+            traceEvent(TRACE_WARNING, "WARNING: pcap_dump_fopen() unable to create file '%s' [errno=%d]", readWriteGlobals->pcapFilePath, errno);
+            pthread_rwlock_unlock(&readWriteGlobals->pcapFileLock);
+            return;
+          }
+        } else {
+          traceEvent(TRACE_WARNING, "WARNING: fopen() unable to create file '%s' [errno=%d]", readWriteGlobals->pcapFilePath, errno);
+          pthread_rwlock_unlock(&readWriteGlobals->pcapFileLock);
+          return;
+        }
+      }
+      pthread_rwlock_unlock(&readWriteGlobals->pcapFileLock);
+    }
+    if ( h->caplen <= LONG_SNAPLEN && p != NULL) {
+      pcap_dump((u_char *)readWriteGlobals->pcapDumper, h, p);
+    } else {
+      traceEvent(TRACE_WARNING, "WARNING: pkt length %d (caplen %d)", h->len, h->caplen);
+    }
+  }
+}
+
+void ClosePcapFile() {
   char newPath[512]; /* same size as pcapFilePath */
   int len = strlen(readWriteGlobals->pcapFilePath)-strlen(TEMP_PREFIX);
 
   // pthread_rwlock_wrlock(&readWriteGlobals->pcapFileLock);
   if(readWriteGlobals->pcapDumper != NULL) {
-    traceEvent(TRACE_NORMAL, "pcap_dump_close");
     pcap_dump_close(readWriteGlobals->pcapDumper);
     // if(readWriteGlobals->pcapDumperFile != NULL){
     //   traceEvent(TRACE_NORMAL, "fclose");
     //   fclose(readWriteGlobals->pcapDumperFile);
     // }
-    readWriteGlobals->pcapDumper = NULL;
-    readWriteGlobals->pcapDumperFile = NULL;
 
     if(readWriteGlobals->pcapFilePath[0] != '\0') {
       strncpy(newPath, readWriteGlobals->pcapFilePath, len); newPath[len] = '\0';
@@ -1287,9 +1350,12 @@ void close_pcap_file() {
       traceEvent(TRACE_NORMAL, "Flow file '%s' is now available", newPath);
     }
     readWriteGlobals->pcapDumper = NULL;
+    readWriteGlobals->pcapDumperFile = NULL;
   }
   // pthread_rwlock_unlock(&readWriteGlobals->pcapFileLock);
 }
+
+/* ****************************************************** */
 
 void close_dump_file() {
   char newPath[512]; /* same size as dumpFilePath */
@@ -1302,7 +1368,7 @@ void close_dump_file() {
       sqlite3_close(readWriteGlobals->sqlite3Handler);
       readWriteGlobals->sqlite3Handler = NULL;
       traceEvent(TRACE_NORMAL, "Insert %u rows into the saved database",
-		 readWriteGlobals->sql_row_idx);
+     readWriteGlobals->sql_row_idx);
     }
   }
 #endif
@@ -1376,17 +1442,17 @@ void exportBucket(FlowHashBucket *myBucket, u_char free_memory) {
       strftime(creation_time, sizeof(creation_time), "%Y/%m/%d/%H", tm);
       snprintf(dir_path, sizeof(dir_path), "mkdir %s %s%c%s",
 #ifdef WIN32
-	       "",
+         "",
 #else
-	       "-p",
+         "-p",
 #endif
-	       readOnlyGlobals.dirPath,
+         readOnlyGlobals.dirPath,
 #ifdef WIN32
-	       '\\'
+         '\\'
 #else
-	       '/'
+         '/'
 #endif
-	       , creation_time);
+         , creation_time);
 
 #ifdef WIN32
       revertSlash(dir_path, 0);
@@ -1394,16 +1460,18 @@ void exportBucket(FlowHashBucket *myBucket, u_char free_memory) {
       rc = system(dir_path);
 
       snprintf(readWriteGlobals->dumpFilePath,
-	       sizeof(readWriteGlobals->dumpFilePath),
-	       "%s%c%s%c%02d.%s%s",
-	       readOnlyGlobals.dirPath, '/', creation_time, '/',
-	       tm->tm_min - (tm->tm_min % ((readOnlyGlobals.file_dump_timeout+59)/60)),
+         sizeof(readWriteGlobals->dumpFilePath),
+         "%s%c%s%c%02d.%s%s",
+         readOnlyGlobals.dirPath, '/', creation_time, '/',
+         tm->tm_min - (tm->tm_min % ((readOnlyGlobals.file_dump_timeout+59)/60)),
 #ifdef HAVE_SQLITE
-	       (readOnlyGlobals.dumpFormat == sqlite_format) ? "sqlite" : "flows",
+         (readOnlyGlobals.dumpFormat == sqlite_format) ? "sqlite" : "flows",
 #else
-	       "flows",
+         "flows",
 #endif
-	       TEMP_PREFIX);
+         TEMP_PREFIX);
+
+      traceEvent(TRACE_WARNING, "Prepare to create file '%s'", readWriteGlobals->dumpFilePath);
 
 #ifdef WIN32
       revertSlash(readWriteGlobals->dumpFilePath, 0);
@@ -1411,67 +1479,67 @@ void exportBucket(FlowHashBucket *myBucket, u_char free_memory) {
 
 #ifdef HAVE_SQLITE
       if(readOnlyGlobals.dumpFormat == sqlite_format) {
-	int rc;
+  int rc;
 
-	traceEvent(TRACE_NORMAL, "About to open database %s", readWriteGlobals->dumpFilePath);
+  traceEvent(TRACE_NORMAL, "About to open database %s", readWriteGlobals->dumpFilePath);
 
-	if((rc = sqlite3_open(readWriteGlobals->dumpFilePath, &readWriteGlobals->sqlite3Handler)) != 0) {
-	  traceEvent(TRACE_WARNING, "WARNING: Unable to create database %s' [%s]",
-		     readWriteGlobals->dumpFilePath, sqlite3_errmsg(readWriteGlobals->sqlite3Handler));
-	  sqlite3_close(readWriteGlobals->sqlite3Handler);
-	  readWriteGlobals->sqlite3Handler = NULL;
-	} else {
-	  int i;
-	  char sql_buffer[2048] = { '\0' };
+  if((rc = sqlite3_open(readWriteGlobals->dumpFilePath, &readWriteGlobals->sqlite3Handler)) != 0) {
+    traceEvent(TRACE_WARNING, "WARNING: Unable to create database %s' [%s]",
+         readWriteGlobals->dumpFilePath, sqlite3_errmsg(readWriteGlobals->sqlite3Handler));
+    sqlite3_close(readWriteGlobals->sqlite3Handler);
+    readWriteGlobals->sqlite3Handler = NULL;
+  } else {
+    int i;
+    char sql_buffer[2048] = { '\0' };
 
-	  traceEvent(TRACE_NORMAL, "Saving flows into temporary database '%s'",
-		     readWriteGlobals->dumpFilePath);
-	  snprintf(sql_buffer, sizeof(sql_buffer), "begin; create table flows (");
+    traceEvent(TRACE_NORMAL, "Saving flows into temporary database '%s'",
+         readWriteGlobals->dumpFilePath);
+    snprintf(sql_buffer, sizeof(sql_buffer), "begin; create table flows (");
 
-	  /* Dump header */
-	  for(i=0; i<TEMPLATE_LIST_LEN; i++) {
-	    if(readOnlyGlobals.v9TemplateElementList[i] != NULL) {
-	      if(i > 0) snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer), ", ");
-	      snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer),
-		       "%s %s",
-		       readOnlyGlobals.v9TemplateElementList[i]->templateElementName,
-		       (readOnlyGlobals.v9TemplateElementList[i]->templateElementLen <= 4) ? "number" : "string");
-	    } else
-	      break;
-	  }
-	  snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer), ")");
+    /* Dump header */
+    for(i=0; i<TEMPLATE_LIST_LEN; i++) {
+      if(readOnlyGlobals.v9TemplateElementList[i] != NULL) {
+        if(i > 0) snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer), ", ");
+        snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer),
+           "%s %s",
+           readOnlyGlobals.v9TemplateElementList[i]->templateElementName,
+           (readOnlyGlobals.v9TemplateElementList[i]->templateElementLen <= 4) ? "number" : "string");
+      } else
+        break;
+    }
+    snprintf(&sql_buffer[strlen(sql_buffer)], sizeof(sql_buffer)-strlen(sql_buffer), ")");
 
-	  sqlite_exec_sql(sql_buffer);
-	}
+    sqlite_exec_sql(sql_buffer);
+  }
       }
 #endif
 
       if((readOnlyGlobals.dumpFormat == text_format)
-	 || (readOnlyGlobals.dumpFormat == binary_format)) {
-	if((readWriteGlobals->flowFd = fopen(readWriteGlobals->dumpFilePath, "w+b")) == NULL) {
-	  traceEvent(TRACE_WARNING, "WARNING: Unable to create file '%s' [errno=%d]",
-		     readWriteGlobals->dumpFilePath, errno);
-	} else {
-	  int i;
+   || (readOnlyGlobals.dumpFormat == binary_format)) {
+  if((readWriteGlobals->flowFd = fopen(readWriteGlobals->dumpFilePath, "w+b")) == NULL) {
+    traceEvent(TRACE_WARNING, "WARNING: Unable to create file '%s' [errno=%d]",
+         readWriteGlobals->dumpFilePath, errno);
+  } else {
+    int i;
 
-	  traceEvent(TRACE_NORMAL, "Saving flows into temporary file '%s'",
-		     readWriteGlobals->dumpFilePath);
+    traceEvent(TRACE_NORMAL, "Saving flows into temporary file '%s'",
+         readWriteGlobals->dumpFilePath);
 
-	  /* Dump header */
-	  if(readOnlyGlobals.dumpFormat == text_format) {
-	    for(i=0; i<TEMPLATE_LIST_LEN; i++) {
-	      if(readOnlyGlobals.v9TemplateElementList[i] != NULL) {
-		if(i > 0) fprintf(readWriteGlobals->flowFd, "%s",
-				  readOnlyGlobals.csv_separator);
-		fprintf(readWriteGlobals->flowFd, "%s",
-			readOnlyGlobals.v9TemplateElementList[i]->templateElementName);
-	      } else
-		break;
-	    }
+    /* Dump header */
+    if(readOnlyGlobals.dumpFormat == text_format) {
+      for(i=0; i<TEMPLATE_LIST_LEN; i++) {
+        if(readOnlyGlobals.v9TemplateElementList[i] != NULL) {
+    if(i > 0) fprintf(readWriteGlobals->flowFd, "%s",
+          readOnlyGlobals.csv_separator);
+    fprintf(readWriteGlobals->flowFd, "%s",
+      readOnlyGlobals.v9TemplateElementList[i]->templateElementName);
+        } else
+    break;
+      }
 
-	    fprintf(readWriteGlobals->flowFd, "\n");
-	  }
-	}
+      fprintf(readWriteGlobals->flowFd, "\n");
+    }
+  }
       }
 
       readWriteGlobals->sql_row_idx = 0;
@@ -1499,24 +1567,24 @@ pthread_rwlock_wrlock(&readWriteGlobals->exportRwLock);
      || ((readOnlyGlobals.netFlowVersion != 5) && (!readOnlyGlobals.bidirectionalFlows))) {
     if(myBucket->flowCounters.bytesRcvd > 0) {
       /*
-	v9 flows do not need to be exported twice, once per direction
-	as they are bi-directional. However if the flow format does not
-	contain bi-directional info (e.g. IN_BYTES, OUT_BYTES) the two
-	flow directions need to be sent anyway. Hence we decide to send
-	both flow directions
+  v9 flows do not need to be exported twice, once per direction
+  as they are bi-directional. However if the flow format does not
+  contain bi-directional info (e.g. IN_BYTES, OUT_BYTES) the two
+  flow directions need to be sent anyway. Hence we decide to send
+  both flow directions
       */
 
       if((myBucket->proto != TCP_PROTOCOL)
-	 || (myBucket->flowCounters.bytesRcvd >= readOnlyGlobals.minFlowSize)) {
-	rc = exportBucketToNetflow(myBucket, 1 /* dst -> src */, free_memory);
+   || (myBucket->flowCounters.bytesRcvd >= readOnlyGlobals.minFlowSize)) {
+  rc = exportBucketToNetflow(myBucket, 1 /* dst -> src */, free_memory);
 
-	if(rc > 0)
-	  readWriteGlobals->totFlows++;
+  if(rc > 0)
+    readWriteGlobals->totFlows++;
       }
 
       if(free_memory && (myBucket->dst2srcPayload != NULL)) {
-	free(myBucket->dst2srcPayload);
-	myBucket->dst2srcPayload = NULL;
+  free(myBucket->dst2srcPayload);
+  myBucket->dst2srcPayload = NULL;
       }
     }
   }
@@ -1532,14 +1600,14 @@ pthread_rwlock_unlock(&readWriteGlobals->exportRwLock);
     if(readOnlyGlobals.deferredHostUpdate) updateFlowHosts(myBucket, NULL, 0, 1);
 
     pluginCallback(DELETE_FLOW_CALLBACK, myBucket,
-		   0, 0,
-		   0, 0,
-		   0, NULL,
-		   NULL, 0,
-		   NULL, 0,
-		   0,
-		   0, 0, NULL, 0, NULL, NULL,
-		   NULL, NULL, NULL, 0);
+       0, 0,
+       0, 0,
+       0, NULL,
+       NULL, 0,
+       NULL, 0,
+       0,
+       0, 0, NULL, 0, NULL, NULL,
+       NULL, NULL, NULL, 0);
   }
     //  pthread_mutex_unlock(&buf_mutex);
 }
@@ -1548,14 +1616,14 @@ pthread_rwlock_unlock(&readWriteGlobals->exportRwLock);
 
 void discardBucket(FlowHashBucket *myBucket) {
   pluginCallback(DELETE_FLOW_CALLBACK, myBucket,
-		 0, 0,
-		 0, 0,
-		 0, NULL,
-		 NULL, 0,
-		 NULL, 0,
-		 0,
-		 0, 0, NULL, 0, NULL, NULL,
-		 NULL, NULL, NULL, 0);
+     0, 0,
+     0, 0,
+     0, NULL,
+     NULL, 0,
+     NULL, 0,
+     0,
+     0, 0, NULL, 0, NULL, NULL,
+     NULL, NULL, NULL, 0);
   
   purgeBucket(myBucket);
 }
@@ -1568,8 +1636,8 @@ void queueBucketToExport(FlowHashBucket *myBucket) {
 
     if(!show_message) {
       traceEvent(TRACE_WARNING,
-		 "Too many (%u) queued buckets for export: bucket discarded.\n",
-		 readWriteGlobals->exportBucketsLen);
+     "Too many (%u) queued buckets for export: bucket discarded.\n",
+     readWriteGlobals->exportBucketsLen);
       traceEvent(TRACE_WARNING, "Please check -e value and decrease it.\n");
       show_message = 1;
     }
@@ -1581,7 +1649,7 @@ void queueBucketToExport(FlowHashBucket *myBucket) {
     readWriteGlobals->exportBucketsLen++;
 #ifdef DEBUG
     traceEvent(TRACE_NORMAL, "[+] [exportBucketsLen=%d][myBucket=%p]",
-	       readWriteGlobals->exportBucketsLen, myBucket);
+         readWriteGlobals->exportBucketsLen, myBucket);
 #endif
     pthread_mutex_unlock(&readWriteGlobals->exportMutex);
     signalCondvar(&readWriteGlobals->exportQueueCondvar, 0);
@@ -1602,11 +1670,11 @@ void* dequeueBucketToExport(void* notUsed) {
 
     if(readWriteGlobals->exportQueue == NULL) {
       if(!readWriteGlobals->shutdownInProgress) {
-	/* traceEvent(TRACE_INFO, "About to call waitCondvar()"); */
-	waitCondvar(&readWriteGlobals->exportQueueCondvar);
-	/* traceEvent(TRACE_INFO, "waitCondvar() called"); */
+  /* traceEvent(TRACE_INFO, "About to call waitCondvar()"); */
+  waitCondvar(&readWriteGlobals->exportQueueCondvar);
+  /* traceEvent(TRACE_INFO, "waitCondvar() called"); */
       } else
-	break;
+  break;
     }
 
     if(readWriteGlobals->exportQueue != NULL) {
@@ -1615,31 +1683,31 @@ void* dequeueBucketToExport(void* notUsed) {
       /* Remove bucket from list */
       pthread_mutex_lock(&readWriteGlobals->exportMutex);
       if(readWriteGlobals->exportQueue != NULL) {
-	myBucket = getListHead(&readWriteGlobals->exportQueue);
-	if(myBucket != NULL) {
-	  if(readWriteGlobals->exportBucketsLen == 0)
-	    traceEvent(TRACE_WARNING, "Internal error (exportBucketsLen == 0)");
-	  else
-	    readWriteGlobals->exportBucketsLen--;
-	}
+  myBucket = getListHead(&readWriteGlobals->exportQueue);
+  if(myBucket != NULL) {
+    if(readWriteGlobals->exportBucketsLen == 0)
+      traceEvent(TRACE_WARNING, "Internal error (exportBucketsLen == 0)");
+    else
+      readWriteGlobals->exportBucketsLen--;
+  }
 #ifdef DEBUG
-	traceEvent(TRACE_NORMAL, "[-] [exportBucketsLen=%d][myBucket=%p]",
-		   readWriteGlobals->exportBucketsLen, myBucket);
+  traceEvent(TRACE_NORMAL, "[-] [exportBucketsLen=%d][myBucket=%p]",
+       readWriteGlobals->exportBucketsLen, myBucket);
 #endif
       } else
-	myBucket = NULL;
+  myBucket = NULL;
 
       pthread_mutex_unlock(&readWriteGlobals->exportMutex);
 
       if(myBucket != NULL) {
-	exportBucket(myBucket, 1);
-	purgeBucket(myBucket);
+  exportBucket(myBucket, 1);
+  purgeBucket(myBucket);
       }
     }
   }
 
   traceEvent(TRACE_INFO, "Export thread terminated [exportQueue=%x]",
-	     readWriteGlobals->exportQueue);
+       readWriteGlobals->exportQueue);
   signalCondvar(&readWriteGlobals->termCondvar, 0);
   return(NULL);
 }
@@ -1677,7 +1745,7 @@ void purgeBucket(FlowHashBucket *myBucket) {
 
 #if 0
   traceEvent(TRACE_NORMAL, "[-] bucketsAllocated=%u",
-	     readWriteGlobals->bucketsAllocated);
+       readWriteGlobals->bucketsAllocated);
 #endif
 }
 

@@ -2500,7 +2500,7 @@ static void shutdown_nprobe(void) {
 
   close_dump_file();
   if(readOnlyGlobals.isSavePcapFile){
-    close_pcap_file();
+    ClosePcapFile();
   }
 
   free_bitmask(&readOnlyGlobals.udpProto);
@@ -2643,10 +2643,15 @@ static int openDevice(char ebuf[], int printErrors,
       u_int snaplen = DEFAULT_SNAPLEN;
 
       if(strstr(readOnlyGlobals.stringTemplate, "%SIP")
+         || strstr(readOnlyGlobals.stringTemplate, "HTTP_URL")
+         || strstr(readOnlyGlobals.stringTemplate, "HTTP_HOST")
+         || strstr(readOnlyGlobals.stringTemplate, "SRV_TYPE")
+         || strstr(readOnlyGlobals.stringTemplate, "DEV_TYPE")
+         || strstr(readOnlyGlobals.stringTemplate, "OS_TYPE")
+         || strstr(readOnlyGlobals.stringTemplate, "MID_TYPE")
+         || strstr(readOnlyGlobals.stringTemplate, "THREAT_TYPE")
          || strstr(readOnlyGlobals.stringTemplate, "%RTP")
-         || strstr(readOnlyGlobals.stringTemplate, "%SMTP")
-   || strstr(readOnlyGlobals.stringTemplate, "HTTP_URL")
-   || strstr(readOnlyGlobals.stringTemplate, "HTTP_HOST"))
+         || strstr(readOnlyGlobals.stringTemplate, "%SMTP"))
         snaplen = LONG_SNAPLEN;
 
       readOnlyGlobals.pcapPtr = pcap_open_live(readOnlyGlobals.tmpDev,
