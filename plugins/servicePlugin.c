@@ -190,6 +190,7 @@ static char *patDirs[] = {
             "/bin/plugins/fp-patterns",
             "/usr/local/lib/nprobe/plugins/fp-patterns",
             "/usr/local/nprobe/lib/nprobe/plugins/fp-patterns",
+            "/bin/plugins/service-patterns",
             NULL };
 static char *patterns_name[PAT_TYPE_NUM] = {"service", "device", "os", "midware","threat"};
 static u_int32_t patterns_priority[PAT_TYPE_NUM];
@@ -201,10 +202,12 @@ const char* os_type = "OS";
 
 static PluginInfo SrvPlugin; /* Forward */
 
-extern void close_pcap_file(void);
-/* ******************************************* */
+// extern int cmpIpAddress(IpAddress *src, IpAddress *dst);
+extern void SavePktToPcap(const struct pcap_pkthdr *h, const u_char *p);
+extern void ClosePcapFile(void);
 
-bool compare_ip(IpAddress IPA, IpAddress IPB) {
+/* ******************************************* */
+bool cmpIpAddress_s(IpAddress IPA, IpAddress IPB) {
   if(IPA.ipVersion == IPB.ipVersion){
     if(IPA.ipVersion == 4){
       if( !memcmp((void *)&IPA.ipType, (void *)&IPB.ipType, sizeof(u_int32_t)) )
@@ -412,7 +415,8 @@ static int loadPattern(const char *file_string, u_int32_t pattern_type) {
     }
     memset(new_pat, 0, sizeof(struct common_pat_info));
     new_pat->type = NULL; new_pat->name = NULL; new_pat->vendor = NULL;
-    new_pat->version = NULL; new_pat->os = NULL; new_pat->pat_regex = NULL;
+    new_pat->version = NULL; new_pat->os = NULL;
+    new_pat->pat_regex = NULL; new_pat->pat_extra = NULL;
     new_pat->id = atoi(pat_obj->string);
     
 
@@ -604,7 +608,7 @@ static int loadPattern(const char *file_string, u_int32_t pattern_type) {
 /* Match regex rules */
 bool RegexFunc1(u_int8_t argv_type, struct pthread_argv_t *p){
 
-  int output[30];
+  int output[30] = {0};
   int head_length = p->head_length;
   int subject_length = p->subject_length;
   u_char *subject_string = *(p->subject_string);
@@ -626,53 +630,29 @@ bool RegexFunc1(u_int8_t argv_type, struct pthread_argv_t *p){
       u_char* subject_string_tmp = subject_string;
       int subject_length_tmp = subject_length;
 
-      if (p->protocol == IPPROTO_UDP){
-        if (pat->protocol == PAT_TCP){
+      if (pat->port != 0 && (pat->port != p->sport && pat->port != p->dport)) { pat = pat->next; continue; }
+      if (pat->protocol == PAT_UDP && p->protocol != IPPROTO_UDP) { pat = pat->next; continue; }
+      if (pat->protocol == PAT_TCP && p->protocol != IPPROTO_TCP) { pat = pat->next; continue; }
+      if (pat->is_http && !p->is_http) { pat = pat->next; continue; }
+      
+      if (pat->is_http){
+        switch(pat->part){
+          case HTTP_HEAD:
+            subject_length_tmp = head_length;
+            break;
+          case HTTP_BODY:
+            subject_length_tmp = subject_length - head_length;
+            subject_string_tmp = subject_string + subject_length + 4;
+            break;
+          case HTTP_TOTAL:
+          default:
+            break;
+        }
+        if(subject_length_tmp <= 0){
           pat = pat->next;
           continue;
         }
-        if (pat->port != 0 && (pat->port != p->sport && pat->port != p->dport)){
-          pat = pat->next;
-          continue;
-        }
-      }// end of udp pkt
-
-      if (p->protocol == IPPROTO_TCP){
-        if (pat->protocol == PAT_UDP){
-          pat = pat->next;
-          continue;
-        }
-        if (pat->port != 0 && (pat->port != p->sport && pat->port != p->dport)){
-          pat = pat->next;
-          continue;
-        }
-
-        if (!p->is_http){
-          if (pat->is_http){
-            pat = pat->next;
-            continue;
-          }
-        } else {
-          if (pat->is_http){
-            switch(pat->part){
-              case HTTP_HEAD:
-                subject_length_tmp = head_length;
-                break;
-              case HTTP_BODY:
-                subject_length_tmp = subject_length - head_length;
-                subject_string_tmp = subject_string + subject_length + 4;
-                break;
-              case HTTP_TOTAL:
-              default:
-                break;
-            }
-            if(subject_length_tmp <= 0){
-              pat = pat->next;
-              continue;
-            }
-          }
-        }// end of http pkt
-      }// end of tcp pkt
+      }
 
       // traceEvent(TRACE_INFO, "Done escape specific protocol/port, subject_length %d.", subject_length);
       // traceEvent(TRACE_INFO, "payload(%d): %s", subject_length, subject_string);
@@ -697,12 +677,12 @@ bool RegexFunc1(u_int8_t argv_type, struct pthread_argv_t *p){
             pinfo->srv_name = pat->name;
             pinfo->flow_checked = pinfo->flow_checked | 0x01;
 
-            // if (pat->os){
-            //   pinfo->os_time = pinfo->srv_time;
-            //   pinfo->os_type = (char*)os_type;
-            //   pinfo->os_name = pat->os;
-            // pinfo->flow_checked = pinfo->flow_checked | 0x04;
-            // }
+            if (pat->os){
+              pinfo->os_time = pinfo->srv_time;
+              pinfo->os_type = (char*)os_type;
+              pinfo->os_name = pat->os;
+              pinfo->flow_checked = pinfo->flow_checked | 0x04;
+            }
 
             memset(pinfo->srv_vers, 0, sizeof(char) * SRV_VERS_LEN);
             if (pat->version == NULL && rc >= 2) {
@@ -798,15 +778,23 @@ bool RegexFunc1(u_int8_t argv_type, struct pthread_argv_t *p){
             pinfo->threat_time = pinfo->src_time;
             pinfo->threat_type = pat->type;
             pinfo->threat_name = pat->name;
+            pinfo->flow_checked = pinfo->flow_checked | 0x10;
 
             if (pat->os){
               pinfo->os_time = pinfo->threat_time;
               pinfo->os_type = (char*)os_type;
               pinfo->os_name = pat->os;
+              pinfo->flow_checked = pinfo->flow_checked | 0x04;
             }
-            // memset(pinfo->threat_index, 0, sizeof(char) * FP_INDEX_LEN);
-            // snprintf(pinfo->threat_index, FP_INDEX_LEN, "%d,%d", output[0], output[1]);
-            // traceEvent(TRACE_WARNING, "pinfo->threat_index: %s .", pinfo->threat_index);
+
+            memset(pinfo->threat_index, 0, sizeof(char) * FP_INDEX_LEN);
+
+            if (output[3]!=0) {
+              snprintf(pinfo->threat_index, FP_INDEX_LEN, "%d,%d", output[2], output[3]);
+            } else {
+              snprintf(pinfo->threat_index, FP_INDEX_LEN, "%d,%d", output[0], output[1]);
+            }
+            // traceEvent(TRACE_WARNING, "pinfo->threat_index: %s", pinfo->threat_index);
             
             memset(pinfo->threat_vers, 0, sizeof(char) * THREAT_VERS_LEN);
             if (pat->version == NULL && rc >= 2) {
@@ -858,16 +846,15 @@ void SrvPlugin_init(int argc, char *argv[]) {
     snprintf(dirPath, sizeof(dirPath), "%s", patDirs[idp]);
     directoryPointer = opendir(dirPath);
 
-    if(directoryPointer != NULL)
+    if(directoryPointer != NULL){
+      traceEvent(TRACE_NORMAL, "Load pattern in %s", dirPath);
       break;
-    else{
+    }else{
       traceEvent(TRACE_NORMAL, "No pattern found in %s", dirPath);
       memset(dirPath, 0, sizeof(dirPath));
     }
-
-    traceEvent(TRACE_NORMAL, ">>Not found patterns."); 
-    return;
   }
+
 
   int i = 0;
   for (; i < PAT_TYPE_NUM; i++) {
@@ -909,7 +896,7 @@ static void SrvPlugin_packet(u_char new_bucket, void *pluginData,
         const struct pcap_pkthdr *h, const u_char *p,
         u_char *payload, int payloadLen) {
   PluginInformation *info;
-  int output[30];
+  // int output[30];
 
   // traceEvent(TRACE_INFO, "SrvPlugin_packet(%d)", payloadLen);
   if(new_bucket) {
@@ -952,7 +939,8 @@ static void SrvPlugin_packet(u_char new_bucket, void *pluginData,
     }
 
     //初始化一系列辅助变量，用于指向将要匹配的数据包以及匹配长度
-    int subject_length = (proto == IPPROTO_UDP) ? (len - sizeof(struct udphdr)) : payloadLen;
+    // int subject_length = (proto == IPPROTO_UDP) ? (len - sizeof(struct udphdr)) : payloadLen;
+    int subject_length = payloadLen;
     int head_length = subject_length;
     u_char *subject_string, *body;
 
@@ -966,7 +954,7 @@ static void SrvPlugin_packet(u_char new_bucket, void *pluginData,
       has_save_pkt = 1;
       pinfo->src_time = h->ts.tv_sec*1000000 + h->ts.tv_usec;
       // traceEvent(TRACE_WARNING, "pinfo->src_time(%u.%u)", h->ts.tv_sec, h->ts.tv_usec);
-    } else if(readOnlyGlobals.isSavePcapFile > 1 && pinfo->dst_time == 0 && compare_ip(pinfo->srcip, *dst)){
+    } else if(readOnlyGlobals.isSavePcapFile > 1 && pinfo->dst_time == 0 && cmpIpAddress_s(pinfo->srcip, *dst)){
       SavePktToPcap(h, p);
       has_save_pkt = 1;
       pinfo->dst_time = h->ts.tv_sec*1000000 + h->ts.tv_usec;
@@ -1012,6 +1000,7 @@ static void SrvPlugin_packet(u_char new_bucket, void *pluginData,
 
     free(pthread_argv);
   }
+
 }
 
 /* *********************************************** */
@@ -1052,7 +1041,7 @@ static int SrvPlugin_export(void *pluginData, V9V10TemplateElementId *theTemplat
     struct plugin_info *pinfo = (struct plugin_info *)pluginData;
 
     bool is_target = 0;
-    is_target = direction ? compare_ip(pinfo->srcip, bkt->dst->host) : compare_ip(pinfo->srcip, bkt->src->host);
+    is_target = direction ? cmpIpAddress_s(pinfo->srcip, bkt->dst->host) : cmpIpAddress_s(pinfo->srcip, bkt->src->host);
 
     // char buf[256], buf1[256], buf2[256];
     // traceEvent(TRACE_INFO, "->direction %d IP target: %s, src: %s, dst: %s, is_target:%d", 
@@ -1343,12 +1332,14 @@ static int SrvPlugin_export(void *pluginData, V9V10TemplateElementId *theTemplat
               memset(&outBuffer[*outBufferBegin], 0, FP_INDEX_LEN);
               
               if(pinfo->threat_index) {
-                copyLen(pinfo->threat_index, FP_INDEX_LEN, outBuffer, outBufferBegin, outBufferMax);
-               if(readOnlyGlobals.traceMode) {
-                  traceEvent(TRACE_NORMAL, "-> THREAT_INDEX: %s", pinfo->threat_index);
-               }
-              } else
-                (*outBufferBegin) += SrvPlugin_template[i].templateElementLen;
+                int len = strlen(pinfo->threat_index);
+                if(len > FP_INDEX_LEN) len = FP_INDEX_LEN;
+                memcpy(&outBuffer[*outBufferBegin], pinfo->threat_index, len);
+                // copyLen(pinfo->threat_index, FP_INDEX_LEN, outBuffer, outBufferBegin, outBufferMax);
+                if(readOnlyGlobals.traceMode) 
+                  traceEvent(TRACE_INFO, "-> THREAT_INDEX: %s", pinfo->threat_index);
+              }
+              (*outBufferBegin) += SrvPlugin_template[i].templateElementLen;
               break;
             default:
               return(-1); /* Not handled */
@@ -1366,13 +1357,13 @@ static int SrvPlugin_export(void *pluginData, V9V10TemplateElementId *theTemplat
             return(-2); /* Too long */
 
           switch(SrvPlugin_template[i].templateElementId) {
-            case BASE_ID+20:
+            case BASE_ID+16:
               memset(&outBuffer[*outBufferBegin], 0, FP_TIME_LEN);
               
               if(pinfo->dst_time) {
                 copyInt64(pinfo->dst_time, outBuffer, outBufferBegin, outBufferMax);
                 if(readOnlyGlobals.traceMode) {
-                  traceEvent(TRACE_INFO, "-> THREAT_RESPONSE_TIME: %lu", pinfo->dst_time);
+                  traceEvent(TRACE_INFO, "-> REVERSE_TIME: %lu", pinfo->dst_time);
                 }
               } else
                 (*outBufferBegin) += SrvPlugin_template[i].templateElementLen;
@@ -1400,7 +1391,7 @@ static int SrvPlugin_print(void *pluginData, V9V10TemplateElementId *theTemplate
     struct plugin_info *pinfo = (struct plugin_info *)pluginData;
 
     bool is_target = 0;
-    is_target = direction ? compare_ip(pinfo->srcip, bkt->dst->host) : compare_ip(pinfo->srcip, bkt->src->host);
+    is_target = direction ? cmpIpAddress_s(pinfo->srcip, bkt->dst->host) : cmpIpAddress_s(pinfo->srcip, bkt->src->host);
 
     if(is_target){
       int i;

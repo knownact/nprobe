@@ -228,6 +228,9 @@ static void dnsPlugin_packet(u_char new_bucket, void *pluginData,
       }
       d++;
 
+      int remain = d - (u_int8_t *)payload;
+      if ( remain <= payloadLen ) return;
+
       while (ancount) {
         memcpy(tm, d, 1);
         //回答区域域名字段可能为2字节指针或不定长
@@ -235,7 +238,7 @@ static void dnsPlugin_packet(u_char new_bucket, void *pluginData,
           d += 2;
         } else {  //不定长域名
           while (*d) {
-            if (0xc0 == ((*d) & 0xc0)) {   //查询鱼应答中name字段有一部分相同，用指针纸指派
+            if (0xc0 == ((*d) & 0xc0)) {   //查询与应答中name字段有一部分相同，用指针纸指派
               d++;
               break;
             } else {
@@ -249,8 +252,14 @@ static void dnsPlugin_packet(u_char new_bucket, void *pluginData,
         d += 8; //查询类型TYPE 2字节， 查询类CLASS 2字节，生存时间 4字节
         memcpy(rdata_len, d, 2);  //资源数据长度
         d += 2;
-        if (ancount == 1 && (1 == ntohs(*qtype) || 28 == ntohs(*qtype))) {  //直解析type为A和AAAA的
+
+        //返回ipv6地址则保留一个
+        if (ancount == 1 && 28 == ntohs(*qtype)) {
           memcpy(pinfo->dns_res, d, ntohs(*rdata_len));
+        }
+        //返回ipv4地址，最多保留4个
+        if (ancount <= 4 && (1 == ntohs(*qtype))) {  //直解析type为A和AAAA的
+          memcpy(pinfo->dns_res + 4 - ancount, d, ntohs(*rdata_len));
           //pinfo->dns_res = ntohl(*res_ip);
         }
         d += ntohs(*rdata_len);
